@@ -37,32 +37,38 @@ export default function ChatInterface() {
   };
 
   return (
-    <div className="w-full h-full p-4 ">
-      <div className="w-full mx-auto  rounded-lg p-4 items-center justify-center">
-        <div className="h-96 h-[600px] overflow-y-auto mb-4 w-full">
-          {messages.map((msg, i) => (
-            <div
-              key={i}
-              className={`p-2 my-2 rounded ${
-                msg.isBot ? "bg-gray-100" : "bg-blue-100"
-              }`}
-            >
-              {msg.text}
-            </div>
-          ))}
-        </div>
+    <div className="w-full h-full p-4 z-10">
+      <div className="w-full mx-auto rounded-lg p-4 items-center justify-center">
+        {messages.length === 0 ? (
+          <div className="text-center text-violet-500 text-[40pt] h-[380px] items-center justify-center flex">
+            What can I assist you with today?
+          </div>
+        ) : (
+          <div className="h-96 h-[600px] overflow-y-auto mb-4 w-full">
+            {messages.map((msg, i) => (
+              <div
+                key={i}
+                className={`p-2 my-2 rounded ${
+                  msg.isBot ? "bg-gray-100" : "bg-blue-100"
+                }`}
+              >
+                {msg.text}
+              </div>
+            ))}
+          </div>
+        )}
         <div className="w-full flex justify-center">
           <div className="flex gap-2 w-[90%] items-center ">
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              className="flex-1 p-4 border rounded focus:border-violet-500 focus:border-2 focus:outline-none shadow-lg shadow-violet-200"
+              className="flex-1 p-4 border rounded focus:border-violet-500 focus:border-2 focus:outline-none shadow-lg shadow-violet-200 bg-white"
               placeholder="Ask CryptoPal..."
             />
             <button
               onClick={handleSend}
-              className="bg-violet-500 text-white p-2 px-4 rounded-full font-bold cursor-pointer"
+              className="bg-violet-500 text-white p-4 px-6 rounded-lg font-bold cursor-pointer"
             >
               Send
             </button>

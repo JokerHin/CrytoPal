@@ -10,9 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^1.1.13",
     "@apollo/client": "^3.13.1",
+    "@hono/node-server": "^1.13.8",
     "@privy-io/react-auth": "^2.4.5",
     "@tailwindcss/vite": "^4.0.8",
+    "ai": "^4.1.45",
     "axios": "^1.7.9",
     "ethers": "^6.13.5",
     "graphql": "^16.10.0",
