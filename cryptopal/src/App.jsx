@@ -14,8 +14,8 @@ function App() {
       <img
         src={robot}
         alt="Robot"
-        className="absolute inset-0 m-auto opacity-70 rounded-full z-0"
-        style={{ width: "200px", height: "200px" }}
+        className="absolute inset-0 m-auto opacity-30 rounded-full z-0"
+        style={{ width: "300px", height: "300px" }}
       />
       <div className="relative z-10">
         <LoginButton />

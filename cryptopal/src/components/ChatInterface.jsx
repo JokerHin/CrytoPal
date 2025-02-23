@@ -36,6 +36,12 @@ export default function ChatInterface() {
     setInput("");
   };
 
+  const handleKeyPress = (event) => {
+    if (event.key === "Enter") {
+      handleSend();
+    }
+  };
+
   return (
     <div className="w-full h-full p-4 z-10">
       <div className="w-full mx-auto rounded-lg p-4 items-center justify-center">
@@ -44,7 +50,7 @@ export default function ChatInterface() {
             What can I assist you with today?
           </div>
         ) : (
-          <div className="h-96 h-[600px] overflow-y-auto mb-4 w-full">
+          <div className="h-[600px] overflow-y-auto mb-4 w-full">
             {messages.map((msg, i) => (
               <div
                 key={i}
@@ -63,6 +69,7 @@ export default function ChatInterface() {
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
+              onKeyPress={handleKeyPress}
               className="flex-1 p-4 border rounded focus:border-violet-500 focus:border-2 focus:outline-none shadow-lg shadow-violet-200 bg-white"
               placeholder="Ask CryptoPal..."
             />
