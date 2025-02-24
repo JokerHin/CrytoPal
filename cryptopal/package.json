@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ai-sdk/google-vertex": "^2.1.17",
     "@ai-sdk/openai": "^1.1.13",
     "@apollo/client": "^3.13.1",
     "@hono/node-server": "^1.13.8",
@@ -17,6 +18,7 @@
     "@tailwindcss/vite": "^4.0.8",
     "ai": "^4.1.45",
     "axios": "^1.7.9",
+    "dotenv": "^16.4.7",
     "ethers": "^6.13.5",
     "graphql": "^16.10.0",
     "hardhat": "^2.22.18",

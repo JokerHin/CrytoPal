@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "@ai-sdk/google-vertex": "^2.1.17",
+    "@privy-io/react-auth": "^2.4.5",
+    "dotenv": "^16.4.7",
+    "ethers": "^6.13.5",
+    "mongoose": "^8.10.1"
+  }
+}

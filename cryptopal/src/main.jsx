@@ -20,7 +20,7 @@ root.render(
         appearance: {
           theme: "light",
           accentColor: "#676FFF",
-          logo: "https://your-logo-url",
+          logo: "https://www.svgrepo.com/show/428624/ethereum-crypto-cryptocurrency-2.svg",
         },
         // Create embedded wallets for users who don't have a wallet
         embeddedWallets: {
