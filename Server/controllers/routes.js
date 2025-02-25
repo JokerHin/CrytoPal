@@ -22,7 +22,7 @@ router.post("/save", async (req, res) => {
 
 // Get Chat History
 router.get("/history", async (req, res) => {
-  const { userId } = req.params;
+  const { userId } = req.query;
 
   try {
     const history = await ChatHistory.findOne({ userId });
@@ -32,27 +32,31 @@ router.get("/history", async (req, res) => {
   }
 });
 
-// Generate AI Response
-router.post("/generate", async (req, res) => {
-  const { messages } = req.body;
-
-  try {
-    const response = await generateAIResponse(messages);
-    res.status(200).json({ text: response });
-  } catch (error) {
-    res.status(500).json({ error: "Failed to generate AI response" });
-  }
-});
-
 // Generate AI Response using Prompt.jsx
 router.post("/generate-prompt", async (req, res) => {
+  const { input } = req.body;
+
+  if (!input) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Input cannot be empty" });
+  }
+
   try {
-    const response = await generateAIResponseFromPrompt(req);
-    res.status(200).json(response);
+    const aiResponse = await generateAIResponse([
+      { role: "user", content: input },
+    ]);
+
+    if (!aiResponse || !aiResponse.response) {
+      return res.status(500).json({ error: "AI response is empty" });
+    }
+
+    res.status(200).json({ response: aiResponse.response });
   } catch (error) {
+    // Respond with the error details for debugging
     res
       .status(500)
-      .json({ error: "Failed to generate AI response using Prompt.jsx" });
+      .json({ error: "Internal Server Error", details: error.message });
   }
 });
 
