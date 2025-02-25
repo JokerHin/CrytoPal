@@ -2,44 +2,41 @@ import React, { useState } from "react";
 import axios from "axios";
 
 export default function ChatInterface() {
-  const [input, setInput] = useState("");
   const [messages, setMessages] = useState([]);
-
-  const handleSend = async () => {
-    setInput("");
-    if (!input.trim()) {
-      alert("Input cannot be empty");
-      return;
-    }
-
-    // Add user message
-    setMessages([...messages, { text: input, isBot: false }]);
-
-    // Call DeepSeek API
-    const response = await axios.post(
-      "https://api.deepseek.com/v1/chat/completions",
-      {
-        model: "deepseek-chat",
-        messages: [{ role: "user", content: input }],
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer YOUR_DEEPSEEK_API_KEY`,
-        },
-      }
-    );
-
-    // Add bot response
-    const botReply = response.data.choices[0].message.content;
-    setMessages([...messages, { text: botReply, isBot: true }]);
-    setInput("");
-  };
+  const [input, setInput] = useState("");
 
   const handleKeyPress = (event) => {
     if (event.key === "Enter") {
       handleSend();
     }
+  };
+
+  const handleSend = async () => {
+    if (!input.trim()) return;
+
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/api/chat/generate-prompt",
+        {
+          input,
+        }
+      );
+
+      // Check response format
+      const botReply = response.data.response; // Adjusted based on new backend format
+      console.log("Bot reply:", botReply);
+
+      setMessages([
+        ...messages,
+        { text: input, isBot: false },
+        { text: botReply, isBot: true },
+      ]);
+    } catch (error) {
+      console.error("Error sending message:", error);
+      alert("Failed to send message. Please try again.");
+    }
+
+    setInput("");
   };
 
   return (

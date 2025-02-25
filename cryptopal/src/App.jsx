@@ -4,6 +4,7 @@ import ChatInterface from "./components/ChatInterface";
 import React from "react";
 import bg from "./assets/bg.png";
 import robot from "./assets/robot.png";
+import Test from "./components/Test";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
       <div className="relative z-10">
         <LoginButton />
         <ChatInterface />
+        <Test />
       </div>
     </div>
   );
