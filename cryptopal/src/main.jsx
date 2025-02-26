@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import { AppProvider } from "./context/AppContext";
 
 import "./index.css";
 
@@ -14,21 +15,20 @@ root.render(
     <PrivyProvider
       appId="cm7g7ttiu00mpppa2eqis8dfk"
       config={{
-        // Display email and wallet as login methods
         loginMethods: ["email", "wallet"],
-        // Customize Privy's appearance in your app
         appearance: {
           theme: "light",
           accentColor: "#676FFF",
           logo: "https://www.svgrepo.com/show/428624/ethereum-crypto-cryptocurrency-2.svg",
         },
-        // Create embedded wallets for users who don't have a wallet
         embeddedWallets: {
           createOnLogin: "users-without-wallets",
         },
       }}
     >
-      <App />
+      <AppProvider>
+        <App />
+      </AppProvider>
     </PrivyProvider>
   </React.StrictMode>
 );

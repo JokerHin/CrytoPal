@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { AppContext } from "../context/AppContext";
 import toggleIcon from "../assets/sidebar.svg";
 import newChatIcon from "../assets/NewChat.png"; // Add the new chat image import
 import saveIcon from "../assets/save.svg"; // Add the save chat image import
@@ -6,12 +7,14 @@ import saveIcon from "../assets/save.svg"; // Add the save chat image import
 export default function History() {
   const [history, setHistory] = useState([]);
   const [showHistory, setShowHistory] = useState(true);
-  const [currentChat, setCurrentChat] = useState([]);
+  const { currentChat, saveChat, startNewChat } = useContext(AppContext);
 
   useEffect(() => {
     // Fetch chat history from the backend
     const fetchHistory = async () => {
-      const response = await fetch("/history?userId=1"); // Replace with actual userId
+      const response = await fetch(
+        "http://localhost:3000/api/chat/history?userId=1"
+      ); // Replace with actual userId
       const data = await response.json();
       setHistory(data);
       console.log(data);
@@ -19,26 +22,6 @@ export default function History() {
 
     fetchHistory();
   }, []);
-
-  const saveChat = async () => {
-    const response = await fetch("/save", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ userId: 1, messages: currentChat }), // Replace with actual userId
-    });
-
-    if (response.ok) {
-      const savedHistory = await response.json();
-      setHistory([...history, ...savedHistory.messages]);
-      setCurrentChat([]);
-    }
-  };
-
-  const startNewChat = () => {
-    setCurrentChat([]);
-  };
 
   return (
     <div
@@ -64,7 +47,9 @@ export default function History() {
           />
         </button>
         <button
-          onClick={startNewChat}
+          onClick={() => {
+            startNewChat();
+          }}
           className={`ml-2 cursor-pointer ${
             !showHistory ? "mt-3 ml-[-1px]" : ""
           }`}
@@ -76,7 +61,14 @@ export default function History() {
           />
         </button>
         <button
-          onClick={saveChat}
+          onClick={async () => {
+            console.log("Saving chat...");
+            const savedHistory = await saveChat();
+            console.log("Saved history:", savedHistory);
+            if (savedHistory) {
+              setHistory([...history, ...savedHistory.messages]);
+            }
+          }}
           className={`ml-2 cursor-pointer ${
             !showHistory ? "mt-3 ml-[-1px]" : ""
           }`}
@@ -95,8 +87,9 @@ export default function History() {
           </h2>
           {history.map((entry, index) => (
             <div key={index} className="mb-4">
-              <div className="font-semibold">You: {entry.input}</div>
-              <div className="text-gray-600">Assistant: {entry.response}</div>
+              <div className="font-semibold">
+                {entry.role === "user" ? "You" : "Assistant"}: {entry.content}
+              </div>
             </div>
           ))}
         </div>

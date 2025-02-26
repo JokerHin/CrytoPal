@@ -1,22 +1,27 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import axios from "axios";
 import Spinner from "../assets/Spinner@1x-1.0s-200px-200px (1).gif";
+import { AppContext } from "../context/AppContext";
 
 export default function ChatInterface() {
-  const [messages, setMessages] = useState([]);
+  const { messages, setMessages } = useContext(AppContext);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleKeyPress = (event) => {
-    if (event.key === "Enter") {
+    if (event.key === "Enter" && input.trim()) {
       setInput("");
       handleSend();
     }
   };
 
   const handleSubmit = () => {
-    setInput("");
-    handleSend();
+    if (input.trim()) {
+      setInput("");
+      handleSend();
+    } else {
+      alert("Input cannot be empty.");
+    }
   };
 
   const handleSend = async () => {
@@ -26,7 +31,7 @@ export default function ChatInterface() {
 
     setMessages([
       ...messages,
-      { text: `Me: ${input}`, isBot: false },
+      { text: input, isBot: false },
       { text: "Assistant is typing...", isBot: true, isLoading: true },
     ]);
 
@@ -50,11 +55,7 @@ export default function ChatInterface() {
         prevMessages.map((msg) =>
           msg.isLoading
             ? {
-                text: `Assistant: ${
-                  typeof botReply === "string"
-                    ? botReply
-                    : JSON.stringify(botReply)
-                }`,
+                text: botReply,
                 isBot: true,
               }
             : msg

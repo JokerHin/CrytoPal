@@ -8,15 +8,27 @@ const router = express.Router();
 router.post("/save", async (req, res) => {
   const { userId, messages } = req.body;
 
+  console.log("Received save request:", { userId, messages });
+
   try {
+    const formattedMessages = messages.map((msg) => ({
+      role: msg.isBot ? "assistant" : "user",
+      content: msg.content ? msg.content.replace(/^Me: |^Assistant: /, "") : "",
+    }));
+
+    console.log("Formatted messages:", formattedMessages);
+
     const history = await ChatHistory.findOneAndUpdate(
       { userId },
-      { $push: { messages: { $each: messages } } },
+      { $push: { messages: { $each: formattedMessages } } },
       { upsert: true, new: true }
     );
     res.status(200).json(history);
   } catch (error) {
-    res.status(500).json({ error: "Failed to save chat history" });
+    console.error("Error saving chat history:", error);
+    res
+      .status(500)
+      .json({ error: "Failed to save chat history", details: error.message });
   }
 });
 
