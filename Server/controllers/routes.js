@@ -8,15 +8,11 @@ const router = express.Router();
 router.post("/save", async (req, res) => {
   const { userId, messages } = req.body;
 
-  console.log("Received save request:", { userId, messages });
-
   try {
     const formattedMessages = messages.map((msg) => ({
       role: msg.isBot ? "assistant" : "user",
       content: msg.content ? msg.content.replace(/^Me: |^Assistant: /, "") : "",
     }));
-
-    console.log("Formatted messages:", formattedMessages);
 
     const newHistory = new ChatHistory({
       userId,
@@ -38,15 +34,11 @@ router.put("/update/:id", async (req, res) => {
   const { id } = req.params;
   const { messages } = req.body;
 
-  console.log("Received update request:", { id, messages });
-
   try {
     const formattedMessages = messages.map((msg) => ({
       role: msg.isBot ? "assistant" : "user",
       content: msg.content ? msg.content.replace(/^Me: |^Assistant: /, "") : "",
     }));
-
-    console.log("Formatted messages:", formattedMessages);
 
     const updatedHistory = await ChatHistory.findByIdAndUpdate(
       id,
@@ -66,8 +58,6 @@ router.put("/update/:id", async (req, res) => {
 // Delete Chat History
 router.delete("/delete/:id", async (req, res) => {
   const { id } = req.params;
-
-  console.log("Received delete request:", { id });
 
   try {
     await ChatHistory.findByIdAndDelete(id);

@@ -85,9 +85,7 @@ export default function History() {
         </button>
         <button
           onClick={async () => {
-            console.log("Saving chat...");
             const savedHistory = await saveChat();
-            console.log("Saved history:", savedHistory);
             if (savedHistory) {
               if (selectedDocument) {
                 setHistory(

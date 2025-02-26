@@ -20,8 +20,6 @@ export const AppProvider = ({ children }) => {
         content: msg.text ? msg.text.replace(/^Me: |^Assistant: /, "") : "",
       }));
 
-      console.log("Sending save request with messages:", formattedMessages);
-
       let response;
       if (selectedDocument) {
         response = await fetch(
