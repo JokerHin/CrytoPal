@@ -8,7 +8,7 @@ import chatRoutes from "./controllers/routes.js"; // Ensure this import is corre
 const app = express();
 app.use(express.json());
 const PORT = process.env.PORT || 4000;
-// connectDB();
+connectDB();
 
 const allowedOrigins = ["http://localhost:5173", process.env.CLIENT_URL];
 // Middleware
