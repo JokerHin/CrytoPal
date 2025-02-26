@@ -80,15 +80,15 @@ export default function ChatInterface() {
   };
 
   return (
-    <div className="w-full h-full p-4 z-10">
-      <div className="w-full mx-auto rounded-lg p-4 items-center justify-center">
+    <div className="w-full h-full p-4 z-10 flex flex-col relative">
+      <div className="w-full mx-auto rounded-lg p-4 items-center justify-center flex-1">
         {messages.length === 0 ? (
           <div className="text-center text-violet-500 text-[40pt] h-[380px] items-center justify-center flex">
             What can I assist you with today?
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center">
-            <div className="h-[600px] overflow-y-auto mb-4 w-[90%] text-xl">
+            <div className="h-[600px] overflow-y-auto overflow-hidden mb-4 w-[90%] text-xl">
               {messages.map((msg, i) => (
                 <div
                   key={i}

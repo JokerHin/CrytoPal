@@ -1,6 +1,6 @@
 import "dotenv/config"; // Load environment variables from .env
 import { google } from "@ai-sdk/google";
-import { generateObject } from "ai";
+import { generateStream } from "ai";
 import { z } from "zod";
 
 const SYSTEM_PROMPT = `
@@ -41,17 +41,22 @@ export const generateAIResponse = async (userMessage) => {
       ...userMessages,
     ];
 
-    const result = await generateObject({
+    const stream = await generateStream({
       model,
       messages,
       schema,
     });
 
-    if (!result || !result.object || !result.object.text) {
+    let response = "";
+    for await (const chunk of stream) {
+      response += chunk.text;
+    }
+
+    if (!response) {
       throw new Error("AI response is empty or malformed");
     }
 
-    return { response: result.object.text };
+    return { response };
   } catch (error) {
     console.error("❌ AI Error:", error.message, error.stack);
     throw new Error(`Failed to generate AI response: ${error.message}`);
