@@ -18,12 +18,13 @@ router.post("/save", async (req, res) => {
 
     console.log("Formatted messages:", formattedMessages);
 
-    const history = await ChatHistory.findOneAndUpdate(
-      { userId },
-      { $push: { messages: { $each: formattedMessages } } },
-      { upsert: true, new: true }
-    );
-    res.status(200).json(history);
+    const newHistory = new ChatHistory({
+      userId,
+      messages: formattedMessages,
+    });
+
+    const savedHistory = await newHistory.save();
+    res.status(200).json(savedHistory);
   } catch (error) {
     console.error("Error saving chat history:", error);
     res
@@ -37,8 +38,8 @@ router.get("/history", async (req, res) => {
   const { userId } = req.query;
 
   try {
-    const history = await ChatHistory.findOne({ userId });
-    res.status(200).json(history?.messages || []);
+    const history = await ChatHistory.find({ userId });
+    res.status(200).json(history);
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch chat history" });
   }

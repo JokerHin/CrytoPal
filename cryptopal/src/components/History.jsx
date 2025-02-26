@@ -66,7 +66,7 @@ export default function History() {
             const savedHistory = await saveChat();
             console.log("Saved history:", savedHistory);
             if (savedHistory) {
-              setHistory([...history, ...savedHistory.messages]);
+              setHistory([...history, savedHistory]);
             }
           }}
           className={`ml-2 cursor-pointer ${
