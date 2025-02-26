@@ -33,6 +33,36 @@ router.post("/save", async (req, res) => {
   }
 });
 
+// Update Chat History
+router.put("/update/:id", async (req, res) => {
+  const { id } = req.params;
+  const { messages } = req.body;
+
+  console.log("Received update request:", { id, messages });
+
+  try {
+    const formattedMessages = messages.map((msg) => ({
+      role: msg.isBot ? "assistant" : "user",
+      content: msg.content ? msg.content.replace(/^Me: |^Assistant: /, "") : "",
+    }));
+
+    console.log("Formatted messages:", formattedMessages);
+
+    const updatedHistory = await ChatHistory.findByIdAndUpdate(
+      id,
+      { messages: formattedMessages },
+      { new: true }
+    );
+
+    res.status(200).json(updatedHistory);
+  } catch (error) {
+    console.error("Error updating chat history:", error);
+    res
+      .status(500)
+      .json({ error: "Failed to update chat history", details: error.message });
+  }
+});
+
 // Get Chat History
 router.get("/history", async (req, res) => {
   const { userId } = req.query;

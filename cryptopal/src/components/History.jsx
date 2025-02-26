@@ -7,7 +7,8 @@ import saveIcon from "../assets/save.svg"; // Add the save chat image import
 export default function History() {
   const [history, setHistory] = useState([]);
   const [showHistory, setShowHistory] = useState(true);
-  const { currentChat, saveChat, startNewChat } = useContext(AppContext);
+  const { currentChat, saveChat, startNewChat, loadChatHistory } =
+    useContext(AppContext);
 
   useEffect(() => {
     // Fetch chat history from the backend
@@ -22,6 +23,15 @@ export default function History() {
 
     fetchHistory();
   }, []);
+
+  const generateSummary = (messages) => {
+    const summaryLength = 50; // Adjust the length of the summary as needed
+    const summary = messages
+      .map((msg) => msg.content)
+      .join(" ")
+      .slice(0, summaryLength);
+    return summary.length === summaryLength ? `${summary}...` : summary;
+  };
 
   return (
     <div
@@ -86,9 +96,13 @@ export default function History() {
             Chat History
           </h2>
           {history.map((entry, index) => (
-            <div key={index} className="mb-4">
-              <div className="font-semibold">
-                {entry.role === "user" ? "You" : "Assistant"}: {entry.content}
+            <div
+              key={index}
+              className="mb-4 cursor-pointer"
+              onClick={() => loadChatHistory(entry)}
+            >
+              <div className="font-semibold hover:bg-gray-200 w-full p-2">
+                {generateSummary(entry.messages)}
               </div>
             </div>
           ))}
