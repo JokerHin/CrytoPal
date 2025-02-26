@@ -6,6 +6,7 @@ export const AppProvider = ({ children }) => {
   const [currentChat, setCurrentChat] = useState([]);
   const [messages, setMessages] = useState([]);
   const [selectedDocument, setSelectedDocument] = useState(null);
+  const [history, setHistory] = useState([]);
 
   const saveChat = async () => {
     if (messages.length === 0) {
@@ -46,6 +47,7 @@ export const AppProvider = ({ children }) => {
       if (response.ok) {
         const savedHistory = await response.json();
         setCurrentChat([]);
+        setSelectedDocument(savedHistory);
         return savedHistory;
       } else {
         console.error("Failed to save chat history:", response.statusText);
@@ -70,6 +72,28 @@ export const AppProvider = ({ children }) => {
     setSelectedDocument(history);
   };
 
+  const deleteChatHistory = async (id) => {
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/chat/delete/${id}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      if (response.ok) {
+        setHistory((prevHistory) =>
+          prevHistory.filter((doc) => doc._id !== id)
+        );
+        alert("Chat history deleted successfully.");
+      } else {
+        console.error("Failed to delete chat history:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error deleting chat history:", error);
+    }
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -81,6 +105,9 @@ export const AppProvider = ({ children }) => {
         setMessages,
         loadChatHistory,
         selectedDocument,
+        deleteChatHistory,
+        history,
+        setHistory,
       }}
     >
       {children}

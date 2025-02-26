@@ -63,6 +63,23 @@ router.put("/update/:id", async (req, res) => {
   }
 });
 
+// Delete Chat History
+router.delete("/delete/:id", async (req, res) => {
+  const { id } = req.params;
+
+  console.log("Received delete request:", { id });
+
+  try {
+    await ChatHistory.findByIdAndDelete(id);
+    res.status(200).json({ message: "Chat history deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting chat history:", error);
+    res
+      .status(500)
+      .json({ error: "Failed to delete chat history", details: error.message });
+  }
+});
+
 // Get Chat History
 router.get("/history", async (req, res) => {
   const { userId } = req.query;

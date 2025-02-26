@@ -3,12 +3,20 @@ import { AppContext } from "../context/AppContext";
 import toggleIcon from "../assets/sidebar.svg";
 import newChatIcon from "../assets/NewChat.png"; // Add the new chat image import
 import saveIcon from "../assets/save.svg"; // Add the save chat image import
+import deleteIcon from "../assets/bin.webp"; // Add the delete chat image import
 
 export default function History() {
-  const [history, setHistory] = useState([]);
   const [showHistory, setShowHistory] = useState(true);
-  const { currentChat, saveChat, startNewChat, loadChatHistory } =
-    useContext(AppContext);
+  const {
+    currentChat,
+    saveChat,
+    startNewChat,
+    loadChatHistory,
+    selectedDocument,
+    deleteChatHistory,
+    history,
+    setHistory,
+  } = useContext(AppContext);
 
   useEffect(() => {
     // Fetch chat history from the backend
@@ -18,11 +26,10 @@ export default function History() {
       ); // Replace with actual userId
       const data = await response.json();
       setHistory(data);
-      console.log(data);
     };
 
     fetchHistory();
-  }, []);
+  }, [setHistory]);
 
   const generateSummary = (messages) => {
     const summaryLength = 50; // Adjust the length of the summary as needed
@@ -31,6 +38,12 @@ export default function History() {
       .join(" ")
       .slice(0, summaryLength);
     return summary.length === summaryLength ? `${summary}...` : summary;
+  };
+
+  const handleDelete = (id) => {
+    if (window.confirm("Are you sure you want to delete this chat history?")) {
+      deleteChatHistory(id);
+    }
   };
 
   return (
@@ -76,7 +89,15 @@ export default function History() {
             const savedHistory = await saveChat();
             console.log("Saved history:", savedHistory);
             if (savedHistory) {
-              setHistory([...history, savedHistory]);
+              if (selectedDocument) {
+                setHistory(
+                  history.map((doc) =>
+                    doc._id === savedHistory._id ? savedHistory : doc
+                  )
+                );
+              } else {
+                setHistory([...history, savedHistory]);
+              }
             }
           }}
           className={`ml-2 cursor-pointer ${
@@ -98,12 +119,21 @@ export default function History() {
           {history.map((entry, index) => (
             <div
               key={index}
-              className="mb-4 cursor-pointer"
+              className="mb-4 cursor-pointer relative group"
               onClick={() => loadChatHistory(entry)}
             >
               <div className="font-semibold hover:bg-gray-200 w-full p-2">
                 {generateSummary(entry.messages)}
               </div>
+              <img
+                src={deleteIcon}
+                alt="Delete"
+                className="absolute right-2 top-2 w-6 h-6 opacity-0 group-hover:opacity-100 cursor-pointer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDelete(entry._id);
+                }}
+              />
             </div>
           ))}
         </div>
