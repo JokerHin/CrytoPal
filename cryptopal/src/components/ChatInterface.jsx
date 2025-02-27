@@ -4,7 +4,8 @@ import Spinner from "../assets/Spinner@1x-1.0s-200px-200px (1).gif";
 import { AppContext } from "../context/AppContext";
 
 export default function ChatInterface() {
-  const { messages, setMessages } = useContext(AppContext);
+  const { messages, setMessages, getBalance, performTransaction } =
+    useContext(AppContext);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -36,31 +37,58 @@ export default function ChatInterface() {
     ]);
 
     try {
-      const response = await axios.post(
-        "http://localhost:3000/api/chat/generate-prompt",
-        {
-          input,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
+      if (input.toLowerCase().includes("balance")) {
+        const balance = await getBalance();
+        setMessages((prevMessages) =>
+          prevMessages.map((msg) =>
+            msg.isLoading
+              ? {
+                  text: `Your balance is ${balance} ETH`,
+                  isBot: true,
+                }
+              : msg
+          )
+        );
+      } else if (input.toLowerCase().includes("transaction")) {
+        const [_, to, amount] = input.split(" ");
+        await performTransaction(to, amount);
+        setMessages((prevMessages) =>
+          prevMessages.map((msg) =>
+            msg.isLoading
+              ? {
+                  text: `Transaction of ${amount} ETH to ${to} completed.`,
+                  isBot: true,
+                }
+              : msg
+          )
+        );
+      } else {
+        const response = await axios.post(
+          "http://localhost:3000/api/chat/generate-prompt",
+          {
+            input,
           },
-        }
-      );
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
-      // Ensure botReply is a string
-      const botReply = response.data.response;
+        // Ensure botReply is a string
+        const botReply = response.data.response;
 
-      setMessages((prevMessages) =>
-        prevMessages.map((msg) =>
-          msg.isLoading
-            ? {
-                text: botReply,
-                isBot: true,
-              }
-            : msg
-        )
-      );
+        setMessages((prevMessages) =>
+          prevMessages.map((msg) =>
+            msg.isLoading
+              ? {
+                  text: botReply,
+                  isBot: true,
+                }
+              : msg
+          )
+        );
+      }
     } catch (error) {
       console.error("Error sending message:", error);
       alert("Failed to send message. Please try again.");

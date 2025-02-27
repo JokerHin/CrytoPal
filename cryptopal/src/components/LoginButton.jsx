@@ -1,9 +1,16 @@
 import { usePrivy } from "@privy-io/react-auth";
-import React from "react";
+import React, { useContext } from "react";
+import { AppContext } from "../context/AppContext";
 import Logo from "../assets/Logo.png";
 
 export default function LoginButton() {
   const { login, logout, authenticated } = usePrivy();
+  const { connectWallet, walletAddress } = useContext(AppContext);
+
+  const handleConnectWallet = async () => {
+    await connectWallet();
+    login();
+  };
 
   return (
     <div className="flex justify-between p-4 w-full">
@@ -14,7 +21,7 @@ export default function LoginButton() {
       <div className="flex items-center pr-10">
         {!authenticated ? (
           <button
-            onClick={login}
+            onClick={handleConnectWallet}
             className="bg-violet-500 text-white font-bold p-4 rounded cursor-pointer active:scale-90  active:duration-300"
           >
             Connect Wallet

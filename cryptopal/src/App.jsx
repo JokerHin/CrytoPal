@@ -5,6 +5,7 @@ import React from "react";
 import bg from "./assets/bg.png";
 import robot from "./assets/robot.png";
 import History from "./components/History";
+import Balance from "./components/Balance.jsx";
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
           <ChatInterface />
         </div>
       </div>
+      <Balance />
     </div>
   );
 }

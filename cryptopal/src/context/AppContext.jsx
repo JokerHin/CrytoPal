@@ -1,4 +1,6 @@
 import React, { createContext, useState } from "react";
+import { ethers } from "ethers";
+import abi from "../../abi.json";
 
 export const AppContext = createContext();
 
@@ -7,6 +9,79 @@ export const AppProvider = ({ children }) => {
   const [messages, setMessages] = useState([]);
   const [selectedDocument, setSelectedDocument] = useState(null);
   const [history, setHistory] = useState([]);
+  const [walletAddress, setWalletAddress] = useState(null);
+  const [provider, setProvider] = useState(null);
+  const [contract, setContract] = useState(null);
+
+  const connectWallet = async () => {
+    try {
+      if (!window.ethereum) {
+        alert("MetaMask is not installed. Please install MetaMask.");
+        console.error("MetaMask not found.");
+        return;
+      }
+
+      console.log("Ethereum provider detected:", window.ethereum);
+      const providerInstance = new ethers.BrowserProvider(window.ethereum);
+      const signer = await providerInstance.getSigner();
+      const address = await signer.getAddress();
+
+      console.log("Wallet connected:", address);
+      setWalletAddress(address);
+      setProvider(providerInstance);
+
+      const contractAddress = import.meta.env.VITE_CONTRACT_ADDRESS;
+      console.log("Smart contract address:", contractAddress);
+      if (!contractAddress) {
+        console.error("Smart contract address is missing in .env");
+        return;
+      }
+
+      const contractInstance = new ethers.Contract(
+        contractAddress,
+        abi,
+        signer
+      );
+      setContract(contractInstance);
+    } catch (error) {
+      console.error("Error connecting wallet:", error);
+    }
+  };
+
+  const getBalance = async () => {
+    if (!walletAddress || !provider) {
+      alert("Please connect your wallet first.");
+      return;
+    }
+
+    try {
+      const balance = await provider.getBalance(walletAddress);
+      console.log("Raw Balance in Wei:", balance);
+      return ethers.formatEther(balance);
+    } catch (error) {
+      console.error("Error getting balance:", error);
+    }
+  };
+
+  const performTransaction = async (to, amount) => {
+    if (!walletAddress || !provider) {
+      alert("Please connect your wallet first.");
+      return;
+    }
+
+    try {
+      const signer = await provider.getSigner();
+      const tx = await signer.sendTransaction({
+        to,
+        value: ethers.parseEther(amount),
+      });
+
+      await tx.wait();
+      alert(`Transaction successful! Hash: ${tx.hash}`);
+    } catch (error) {
+      console.error("Error performing transaction:", error);
+    }
+  };
 
   const saveChat = async () => {
     if (messages.length === 0) {
@@ -26,19 +101,15 @@ export const AppProvider = ({ children }) => {
           `http://localhost:3000/api/chat/update/${selectedDocument._id}`,
           {
             method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ messages: formattedMessages }),
           }
         );
       } else {
         response = await fetch("http://localhost:3000/api/chat/save", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ userId: 1, messages: formattedMessages }), // Replace with actual userId
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userId: 1, messages: formattedMessages }),
         });
       }
 
@@ -55,12 +126,6 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  const startNewChat = () => {
-    setCurrentChat([]);
-    setMessages([]);
-    setSelectedDocument(null);
-  };
-
   const loadChatHistory = (history) => {
     const formattedMessages = history.messages.map((msg) => ({
       text: msg.content,
@@ -70,42 +135,22 @@ export const AppProvider = ({ children }) => {
     setSelectedDocument(history);
   };
 
-  const deleteChatHistory = async (id) => {
-    try {
-      const response = await fetch(
-        `http://localhost:3000/api/chat/delete/${id}`,
-        {
-          method: "DELETE",
-        }
-      );
-
-      if (response.ok) {
-        setHistory((prevHistory) =>
-          prevHistory.filter((doc) => doc._id !== id)
-        );
-        alert("Chat history deleted successfully.");
-      } else {
-        console.error("Failed to delete chat history:", response.statusText);
-      }
-    } catch (error) {
-      console.error("Error deleting chat history:", error);
-    }
-  };
-
   return (
     <AppContext.Provider
       value={{
         currentChat,
         setCurrentChat,
         saveChat,
-        startNewChat,
         messages,
         setMessages,
-        loadChatHistory,
         selectedDocument,
-        deleteChatHistory,
         history,
         setHistory,
+        connectWallet,
+        getBalance,
+        performTransaction,
+        walletAddress,
+        loadChatHistory,
       }}
     >
       {children}
