@@ -2,6 +2,7 @@ import React, { useState, useContext } from "react";
 import axios from "axios";
 import Spinner from "../assets/Spinner@1x-1.0s-200px-200px (1).gif";
 import { AppContext } from "../context/AppContext";
+import Balance from "./balance";
 
 export default function ChatInterface() {
   const { messages, setMessages, getBalance, performTransaction } =
@@ -39,15 +40,15 @@ export default function ChatInterface() {
     try {
       if (input.toLowerCase().includes("balance")) {
         const balance = await getBalance();
+
+        // ✅ Add Balance component instead of text
         setMessages((prevMessages) =>
-          prevMessages.map((msg) =>
-            msg.isLoading
-              ? {
-                  text: `Your balance is ${balance} ETH`,
-                  isBot: true,
-                }
-              : msg
-          )
+          prevMessages
+            .filter((msg) => !msg.isLoading)
+            .concat({
+              isComponent: true,
+              component: <Balance key={Date.now()} balance={balance} />,
+            })
         );
       } else if (input.toLowerCase().includes("transaction")) {
         const [_, to, amount] = input.split(" ");
@@ -75,7 +76,6 @@ export default function ChatInterface() {
           }
         );
 
-        // Ensure botReply is a string
         const botReply = response.data.response;
 
         setMessages((prevMessages) =>
@@ -127,10 +127,12 @@ export default function ChatInterface() {
                 >
                   {msg.isLoading ? (
                     <img src={Spinner} alt="Loading..." className="w-6 h-6" />
-                  ) : (
+                  ) : msg.text ? (
                     renderMessageText(msg.text).map((line, index) => (
                       <div key={index}>{line}</div>
                     ))
+                  ) : (
+                    msg.component
                   )}
                 </div>
               ))}

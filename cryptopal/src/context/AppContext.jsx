@@ -135,6 +135,25 @@ export const AppProvider = ({ children }) => {
     setSelectedDocument(history);
   };
 
+  const deleteChatHistory = async (id) => {
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/chat/delete/${id}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      if (response.ok) {
+        setHistory(history.filter((doc) => doc._id !== id));
+      } else {
+        console.error("Failed to delete chat history:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error deleting chat history:", error);
+    }
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -151,6 +170,7 @@ export const AppProvider = ({ children }) => {
         performTransaction,
         walletAddress,
         loadChatHistory,
+        deleteChatHistory,
       }}
     >
       {children}
