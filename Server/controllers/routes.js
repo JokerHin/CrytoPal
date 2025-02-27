@@ -6,12 +6,23 @@ const router = express.Router();
 
 // Save Chat History
 router.post("/save", async (req, res) => {
-  const { userId, messages } = req.body;
-
   try {
+    const { userId, messages } = req.body;
+
+    console.log("Received chat data:", JSON.stringify(req.body, null, 2)); // ✅ Log request data
+
+    if (!messages || !Array.isArray(messages)) {
+      throw new Error("Invalid messages format");
+    }
+
     const formattedMessages = messages.map((msg) => ({
-      role: msg.isBot ? "assistant" : "user",
-      content: msg.content ? msg.content.replace(/^Me: |^Assistant: /, "") : "",
+      role: msg.role,
+      content:
+        typeof msg.content === "string"
+          ? msg.content
+          : msg.content.type === "balance" && msg.content.balance
+          ? { type: "balance", balance: msg.content.balance }
+          : "Missing content", // ✅ Ensure valid content
     }));
 
     const newHistory = new ChatHistory({
@@ -20,12 +31,15 @@ router.post("/save", async (req, res) => {
     });
 
     const savedHistory = await newHistory.save();
+    console.log("Saved chat history:", savedHistory);
+
     res.status(200).json(savedHistory);
   } catch (error) {
-    console.error("Error saving chat history:", error);
-    res
-      .status(500)
-      .json({ error: "Failed to save chat history", details: error.message });
+    console.error("Error saving chat history:", error.message); // ✅ Log actual error
+    res.status(500).json({
+      error: "Failed to save chat history",
+      details: error.message,
+    });
   }
 });
 
@@ -36,13 +50,18 @@ router.put("/update/:id", async (req, res) => {
 
   try {
     const formattedMessages = messages.map((msg) => ({
-      role: msg.isBot ? "assistant" : "user",
-      content: msg.content ? msg.content.replace(/^Me: |^Assistant: /, "") : "",
+      role: msg.role,
+      content:
+        typeof msg.content === "string"
+          ? msg.content
+          : msg.content.type === "balance" && msg.content.balance
+          ? { type: "balance", balance: msg.content.balance }
+          : "Missing content", // ✅ Ensure valid content
     }));
 
     const updatedHistory = await ChatHistory.findByIdAndUpdate(
       id,
-      { messages: formattedMessages },
+      { messages: formattedMessages.filter((msg) => msg.content) }, // Filter out messages without content
       { new: true }
     );
 
@@ -103,7 +122,7 @@ router.post("/generate-prompt", async (req, res) => {
 
     res.status(200).json({ response: aiResponse.response });
   } catch (error) {
-    // Respond with the error details for debugging
+    console.error("Error generating AI response:", error.message, error.stack); // Log error details
     res
       .status(500)
       .json({ error: "Internal Server Error", details: error.message });

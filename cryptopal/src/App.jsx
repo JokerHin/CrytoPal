@@ -5,6 +5,7 @@ import React from "react";
 import bg from "./assets/bg.png";
 import robot from "./assets/robot.png";
 import History from "./components/History";
+import Receipt from "./components/Receipt";
 
 function App() {
   return (

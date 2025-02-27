@@ -1,15 +1,21 @@
 import { usePrivy } from "@privy-io/react-auth";
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { AppContext } from "../context/AppContext";
 import Logo from "../assets/Logo.png";
+import MetaMaskLogo from "../assets/MetaMask.webp"; // Add MetaMask logo import
 
 export default function LoginButton() {
   const { login, logout, authenticated } = usePrivy();
   const { connectWallet, walletAddress } = useContext(AppContext);
+  const [showDropdown, setShowDropdown] = useState(false);
 
   const handleConnectWallet = async () => {
     await connectWallet();
     login();
+  };
+
+  const truncateAddress = (address) => {
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
 
   return (
@@ -18,7 +24,7 @@ export default function LoginButton() {
         <img src={Logo} alt="Logo" className="w-25 h-25" />
         <p className="font-bold text-2xl ml-[-10] text-violet-500">CrytoPal</p>
       </div>
-      <div className="flex items-center pr-10">
+      <div className="flex items-center pr-10 relative">
         {!authenticated ? (
           <button
             onClick={handleConnectWallet}
@@ -27,12 +33,26 @@ export default function LoginButton() {
             Connect Wallet
           </button>
         ) : (
-          <button
-            onClick={logout}
-            className="bg-violet-500 text-white font-bold p-4 rounded-full cursor-pointer active:scale-90  active:duration-300"
+          <div
+            className="flex items-center cursor-pointer"
+            onMouseEnter={() => setShowDropdown(true)}
+            onMouseLeave={() => setShowDropdown(false)}
           >
-            Disconnect
-          </button>
+            <img src={MetaMaskLogo} alt="MetaMask" className="w-8 h-8 mr-2" />
+            <span className="text-white font-bold">
+              {truncateAddress(walletAddress)}
+            </span>
+            {showDropdown && (
+              <div className="absolute top-full mt-2 right-0 bg-white shadow-lg rounded p-2">
+                <button
+                  onClick={logout}
+                  className="text-red-500 font-bold p-2 w-full text-left"
+                >
+                  Disconnect
+                </button>
+              </div>
+            )}
+          </div>
         )}
       </div>
     </div>

@@ -73,7 +73,7 @@ export const generateAIResponse = async (userMessage) => {
 
     return { response: result.object.text };
   } catch (error) {
-    console.error("❌ AI Error:", error.message, error.stack);
+    console.error("❌ AI Error:", error.message, error.stack); // Log error details
     throw new Error(`Failed to generate AI response: ${error.message}`);
   }
 };

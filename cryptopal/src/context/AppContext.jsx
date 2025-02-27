@@ -1,6 +1,8 @@
 import React, { createContext, useState } from "react";
 import { ethers } from "ethers";
 import abi from "../../abi.json";
+import Balance from "../components/balance";
+import Receipt from "../components/Receipt";
 
 export const AppContext = createContext();
 
@@ -12,6 +14,11 @@ export const AppProvider = ({ children }) => {
   const [walletAddress, setWalletAddress] = useState(null);
   const [provider, setProvider] = useState(null);
   const [contract, setContract] = useState(null);
+  const [transactionStep, setTransactionStep] = useState(0);
+  const [transactionDetails, setTransactionDetails] = useState({
+    to: "",
+    amount: "",
+  });
 
   const connectWallet = async () => {
     try {
@@ -78,22 +85,65 @@ export const AppProvider = ({ children }) => {
 
       await tx.wait();
       alert(`Transaction successful! Hash: ${tx.hash}`);
+      setTransactionStep(0); // Reset transaction step after success
+
+      // Show receipt
+      setMessages((prevMessages) =>
+        prevMessages.concat({
+          isComponent: true,
+          component: (
+            <Receipt
+              key={Date.now()}
+              walletAddress={walletAddress}
+              recipientAddress={to}
+            />
+          ),
+        })
+      );
     } catch (error) {
       console.error("Error performing transaction:", error);
     }
   };
 
+  const handleTransactionInput = (input) => {
+    if (transactionStep === 0) {
+      setTransactionDetails({ ...transactionDetails, to: input });
+      setTransactionStep(1);
+      return "Please enter the amount to transfer.";
+    } else if (transactionStep === 1) {
+      setTransactionDetails({ ...transactionDetails, amount: input });
+      setTransactionStep(2);
+      return `You are about to transfer ${input} ETH to ${transactionDetails.to}. Please confirm.`;
+    } else if (transactionStep === 2) {
+      performTransaction(transactionDetails.to, transactionDetails.amount);
+      return `Transaction of ${transactionDetails.amount} ETH to ${transactionDetails.to} completed.`;
+    }
+  };
+
+  const showPopup = (message) => {
+    alert(message);
+  };
+
   const saveChat = async () => {
     if (messages.length === 0) {
-      alert("No messages to save.");
+      showPopup("No messages to save.");
       return;
     }
 
     try {
       const formattedMessages = messages.map((msg) => ({
         role: msg.isBot ? "assistant" : "user",
-        content: msg.text ? msg.text.replace(/^Me: |^Assistant: /, "") : "",
+        content:
+          msg.text ||
+          (msg.component && msg.component.props.balance
+            ? { type: "balance", balance: msg.component.props.balance }
+            : "Missing content"), // ✅ Ensure valid content
       }));
+
+      console.log(
+        "Sending chat history:",
+        JSON.stringify(formattedMessages, null, 2)
+      ); // ✅ Debug frontend data
 
       let response;
       if (selectedDocument) {
@@ -117,6 +167,7 @@ export const AppProvider = ({ children }) => {
         const savedHistory = await response.json();
         setCurrentChat([]);
         setSelectedDocument(savedHistory);
+        showPopup("Chat history saved successfully!");
         return savedHistory;
       } else {
         console.error("Failed to save chat history:", response.statusText);
@@ -128,9 +179,14 @@ export const AppProvider = ({ children }) => {
 
   const loadChatHistory = (history) => {
     const formattedMessages = history.messages.map((msg) => ({
-      text: msg.content,
+      text: typeof msg.content === "string" ? msg.content : null,
       isBot: msg.role === "assistant",
+      component:
+        typeof msg.content === "object" && msg.content.type === "balance" ? (
+          <Balance key={Date.now()} balance={msg.content.balance} />
+        ) : null,
     }));
+
     setMessages(formattedMessages);
     setSelectedDocument(history);
   };
@@ -154,6 +210,11 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  const startNewChat = () => {
+    setMessages([]);
+    setSelectedDocument(null);
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -168,9 +229,11 @@ export const AppProvider = ({ children }) => {
         connectWallet,
         getBalance,
         performTransaction,
+        handleTransactionInput,
         walletAddress,
         loadChatHistory,
         deleteChatHistory,
+        startNewChat,
       }}
     >
       {children}

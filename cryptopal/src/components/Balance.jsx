@@ -38,7 +38,7 @@ export default function Balance({ balance }) {
   }, []);
 
   return (
-    <div className="items-center bg-gray-200 w-[450px] rounded-2xl p-6">
+    <div className="items-center bg-gray-200 w-[600px] rounded-2xl p-6">
       <div>
         <p className="text-2xl font-bold text-violet-500">Your Wallet</p>
         <p className="text-md text-gray-500">Crypto balance:</p>

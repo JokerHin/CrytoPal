@@ -5,7 +5,7 @@ const ChatHistorySchema = new Schema({
   messages: [
     {
       role: { type: String, enum: ["user", "assistant"], required: true },
-      content: { type: String, required: true },
+      content: { type: Schema.Types.Mixed, required: true }, // Allow content to be string or object
     },
   ],
   createdAt: { type: Date, default: Date.now },

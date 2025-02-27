@@ -5,7 +5,7 @@ import { AppContext } from "../context/AppContext";
 import Balance from "./balance";
 
 export default function ChatInterface() {
-  const { messages, setMessages, getBalance, performTransaction } =
+  const { messages, setMessages, getBalance, handleTransactionInput } =
     useContext(AppContext);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -51,13 +51,12 @@ export default function ChatInterface() {
             })
         );
       } else if (input.toLowerCase().includes("transaction")) {
-        const [_, to, amount] = input.split(" ");
-        await performTransaction(to, amount);
+        const responseText = handleTransactionInput(input);
         setMessages((prevMessages) =>
           prevMessages.map((msg) =>
             msg.isLoading
               ? {
-                  text: `Transaction of ${amount} ETH to ${to} completed.`,
+                  text: responseText,
                   isBot: true,
                 }
               : msg
