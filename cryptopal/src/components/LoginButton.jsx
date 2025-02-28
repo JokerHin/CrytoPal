@@ -14,11 +14,6 @@ export default function LoginButton() {
     login();
   };
 
-  const truncateAddress = (address) => {
-    if (!address) return "";
-    return `${address.slice(0, 6)}...${address.slice(-4)}`;
-  };
-
   return (
     <div className="flex justify-between p-4 w-full">
       <div className="flex items-center pl-10">
@@ -35,19 +30,17 @@ export default function LoginButton() {
           </button>
         ) : (
           <div
-            className="flex items-center cursor-pointer"
+            className="flex justify-center items-center cursor-pointer "
             onMouseEnter={() => setShowDropdown(true)}
             onMouseLeave={() => setShowDropdown(false)}
           >
-            <img src={MetaMaskLogo} alt="MetaMask" className="w-8 h-8 mr-2" />
-            <span className="text-white font-bold">
-              {truncateAddress(walletAddress)}
-            </span>
+            <img src={MetaMaskLogo} alt="MetaMask" className="w-10 h-10 mr-2" />
+            <span className="font-bold truncate w-20">{walletAddress}</span>
             {showDropdown && (
-              <div className="absolute top-full mt-2 right-0 bg-white shadow-lg rounded p-2">
+              <div className="absolute top-13 mt-2 right-3 bg-white shadow-lg rounded p-2">
                 <button
                   onClick={logout}
-                  className="text-red-500 font-bold p-2 w-full text-left"
+                  className="text-red-500 font-bold p-2 w-full text-left cursor-pointer"
                 >
                   Disconnect
                 </button>

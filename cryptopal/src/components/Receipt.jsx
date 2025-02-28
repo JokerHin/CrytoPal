@@ -13,7 +13,7 @@ export default function Receipt({ walletAddress, recipientAddress }) {
           <p className="text-md text-gray-500">From:</p>
           <p className="text-xl font-bold truncate">{walletAddress}</p>
         </div>
-        <div className="mt-4 ">
+        <div className="mt-4">
           <p className="text-md text-gray-500">To:</p>
           <p className="text-xl font-bold truncate">{recipientAddress}</p>
         </div>

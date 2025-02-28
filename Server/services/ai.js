@@ -2,6 +2,7 @@ import "dotenv/config"; // Load environment variables from .env
 import { google } from "@ai-sdk/google";
 import { generateObject } from "ai";
 import { z } from "zod";
+import { tools } from "./transaction.js";
 
 const SYSTEM_PROMPT = `
 You are CryptoPal, an AI assistant for managing crypto wallets. Your capabilities include:
@@ -65,6 +66,7 @@ export const generateAIResponse = async (userMessage) => {
       model,
       messages,
       schema,
+      tools,
     });
 
     if (!result || !result.object || !result.object.text) {

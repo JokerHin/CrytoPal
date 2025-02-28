@@ -3,6 +3,7 @@ import { ethers } from "ethers";
 import abi from "../../abi.json";
 import Balance from "../components/balance";
 import Receipt from "../components/Receipt";
+import axios from "axios";
 
 export const AppContext = createContext();
 
@@ -71,37 +72,44 @@ export const AppProvider = ({ children }) => {
   };
 
   const performTransaction = async (to, amount) => {
-    if (!walletAddress || !provider) {
-      alert("Please connect your wallet first.");
-      return;
-    }
-
     try {
-      const signer = await provider.getSigner();
-      const tx = await signer.sendTransaction({
-        to,
-        value: ethers.parseEther(amount),
-      });
-
-      await tx.wait();
-      alert(`Transaction successful! Hash: ${tx.hash}`);
-      setTransactionStep(0); // Reset transaction step after success
-
-      // Show receipt
-      setMessages((prevMessages) =>
-        prevMessages.concat({
-          isComponent: true,
-          component: (
-            <Receipt
-              key={Date.now()}
-              walletAddress={walletAddress}
-              recipientAddress={to}
-            />
-          ),
-        })
+      const response = await axios.post(
+        "http://localhost:3000/api/transaction",
+        {
+          sender: walletAddress,
+          recipient: to,
+          amount,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
       );
+
+      if (response.data.status === "success") {
+        alert(`Transaction successful! Hash: ${response.data.transactionHash}`);
+        setTransactionStep(0); // Reset transaction step after success
+
+        // Show receipt
+        setMessages((prevMessages) =>
+          prevMessages.concat({
+            isComponent: true,
+            component: (
+              <Receipt
+                key={Date.now()}
+                walletAddress={walletAddress}
+                recipientAddress={to}
+              />
+            ),
+          })
+        );
+      } else {
+        throw new Error(response.data.message);
+      }
     } catch (error) {
       console.error("Error performing transaction:", error);
+      alert(`Failed to perform transaction: ${error.message}`);
     }
   };
 

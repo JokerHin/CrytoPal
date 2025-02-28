@@ -1,6 +1,7 @@
 import express from "express";
 import ChatHistory from "../models/ChatHistory.js";
 import { generateAIResponse } from "../services/ai.js";
+import { performTransaction } from "../services/transaction.js";
 
 const router = express.Router();
 
@@ -123,6 +124,30 @@ router.post("/generate-prompt", async (req, res) => {
     res.status(200).json({ response: aiResponse.response });
   } catch (error) {
     console.error("Error generating AI response:", error.message, error.stack); // Log error details
+    res
+      .status(500)
+      .json({ error: "Internal Server Error", details: error.message });
+  }
+});
+
+// Perform Transaction
+router.post("/transaction", async (req, res) => {
+  const { sender, recipient, amount } = req.body;
+
+  try {
+    const result = await performTransaction.execute({
+      sender,
+      recipient,
+      amount,
+    });
+
+    if (result.status === "success") {
+      res.status(200).json(result);
+    } else {
+      res.status(500).json(result);
+    }
+  } catch (error) {
+    console.error("Error performing transaction:", error.message, error.stack); // Log error details
     res
       .status(500)
       .json({ error: "Internal Server Error", details: error.message });
