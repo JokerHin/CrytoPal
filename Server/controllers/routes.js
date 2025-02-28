@@ -1,7 +1,6 @@
 import express from "express";
 import ChatHistory from "../models/ChatHistory.js";
 import { generateAIResponse } from "../services/ai.js";
-import { performTransaction } from "../services/transaction.js";
 
 const router = express.Router();
 
@@ -23,6 +22,14 @@ router.post("/save", async (req, res) => {
           ? msg.content
           : msg.content.type === "balance" && msg.content.balance
           ? { type: "balance", balance: msg.content.balance }
+          : msg.content.type === "transaction" && msg.content.walletAddress
+          ? {
+              type: "transaction",
+              walletAddress: msg.content.walletAddress,
+              recipientAddress: msg.content.recipientAddress,
+            }
+          : msg.content.type === "transaction" && msg.content.details
+          ? { type: "transaction", details: msg.content.details }
           : "Missing content", // ✅ Ensure valid content
     }));
 
@@ -57,6 +64,14 @@ router.put("/update/:id", async (req, res) => {
           ? msg.content
           : msg.content.type === "balance" && msg.content.balance
           ? { type: "balance", balance: msg.content.balance }
+          : msg.content.type === "transaction" && msg.content.walletAddress
+          ? {
+              type: "transaction",
+              walletAddress: msg.content.walletAddress,
+              recipientAddress: msg.content.recipientAddress,
+            }
+          : msg.content.type === "transaction" && msg.content.details
+          ? { type: "transaction", details: msg.content.details }
           : "Missing content", // ✅ Ensure valid content
     }));
 

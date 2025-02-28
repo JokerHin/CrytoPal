@@ -3,6 +3,7 @@ import { ethers } from "ethers";
 import abi from "../../abi.json";
 import Balance from "../components/balance";
 import Receipt from "../components/Receipt";
+import Transaction from "../components/Transaction";
 import axios from "axios";
 
 export const AppContext = createContext();
@@ -72,57 +73,59 @@ export const AppProvider = ({ children }) => {
   };
 
   const performTransaction = async (to, amount) => {
+    if (!walletAddress || !provider) {
+      alert("Please connect your wallet first.");
+      return;
+    }
+
     try {
-      const response = await axios.post(
-        "http://localhost:3000/api/transaction",
-        {
-          sender: walletAddress,
-          recipient: to,
-          amount,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
+      const signer = await provider.getSigner();
+      const contractWithSigner = contract.connect(signer);
+      const tx = await contractWithSigner.desposit({
+        value: ethers.parseEther(amount),
+      });
+
+      await tx.wait();
+      alert(`Transaction successful! Hash: ${tx.hash}`);
+      setTransactionStep(0); // Reset transaction step after success
+
+      // Show receipt
+      setMessages((prevMessages) =>
+        prevMessages.concat({
+          isComponent: true,
+          component: (
+            <Receipt
+              key={Date.now()}
+              walletAddress={walletAddress}
+              recipientAddress={to}
+            />
+          ),
+        })
       );
-
-      if (response.data.status === "success") {
-        alert(`Transaction successful! Hash: ${response.data.transactionHash}`);
-        setTransactionStep(0); // Reset transaction step after success
-
-        // Show receipt
-        setMessages((prevMessages) =>
-          prevMessages.concat({
-            isComponent: true,
-            component: (
-              <Receipt
-                key={Date.now()}
-                walletAddress={walletAddress}
-                recipientAddress={to}
-              />
-            ),
-          })
-        );
-      } else {
-        throw new Error(response.data.message);
-      }
     } catch (error) {
       console.error("Error performing transaction:", error);
-      alert(`Failed to perform transaction: ${error.message}`);
     }
   };
 
   const handleTransactionInput = (input) => {
     if (transactionStep === 0) {
-      setTransactionDetails({ ...transactionDetails, to: input });
+      setMessages((prevMessages) =>
+        prevMessages.concat({
+          isComponent: true,
+          component: <Transaction key={Date.now()} />,
+        })
+      );
       setTransactionStep(1);
-      return "Please enter the amount to transfer.";
+      return "Please fill in the transaction details.";
     } else if (transactionStep === 1) {
-      setTransactionDetails({ ...transactionDetails, amount: input });
+      setTransactionDetails({ ...transactionDetails, to: input });
       setTransactionStep(2);
-      return `You are about to transfer ${input} ETH to ${transactionDetails.to}. Please confirm.`;
+      return "Please enter the amount to transfer.";
     } else if (transactionStep === 2) {
+      setTransactionDetails({ ...transactionDetails, amount: input });
+      setTransactionStep(3);
+      return `You are about to transfer ${input} ETH to ${transactionDetails.to}. Please confirm.`;
+    } else if (transactionStep === 3) {
       performTransaction(transactionDetails.to, transactionDetails.amount);
       return `Transaction of ${transactionDetails.amount} ETH to ${transactionDetails.to} completed.`;
     }
@@ -145,6 +148,14 @@ export const AppProvider = ({ children }) => {
           msg.text ||
           (msg.component && msg.component.props.balance
             ? { type: "balance", balance: msg.component.props.balance }
+            : msg.component && msg.component.props.walletAddress
+            ? {
+                type: "transaction",
+                walletAddress: msg.component.props.walletAddress,
+                recipientAddress: msg.component.props.recipientAddress,
+              }
+            : msg.component && msg.component.type === Transaction
+            ? { type: "transaction", details: "Transaction details" }
             : "Missing content"), // ✅ Ensure valid content
       }));
 
@@ -192,6 +203,15 @@ export const AppProvider = ({ children }) => {
       component:
         typeof msg.content === "object" && msg.content.type === "balance" ? (
           <Balance key={Date.now()} balance={msg.content.balance} />
+        ) : typeof msg.content === "object" &&
+          msg.content.type === "transaction" ? (
+          <Receipt
+            key={Date.now()}
+            walletAddress={msg.content.walletAddress}
+            recipientAddress={msg.content.recipientAddress}
+          />
+        ) : msg.content === "Transaction details" ? (
+          <Transaction key={Date.now()} />
         ) : null,
     }));
 
