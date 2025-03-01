@@ -5,6 +5,7 @@ import Balance from "../components/balance";
 import Receipt from "../components/Receipt";
 import Transaction from "../components/Transaction";
 import CurrentPrice from "../components/CurrentPrice";
+import Prediction from "../components/Prediction";
 import axios from "axios";
 
 export const AppContext = createContext();
@@ -132,6 +133,45 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  const fetchTransactionHistory = async (userAddress) => {
+    const query = `
+      query ($userAddress: String!) {
+        incoming: transfers(where: { to: $userAddress }) {
+          id
+          from
+          to
+          value
+          timestamp
+        }
+        outgoing: transfers(where: { from: $userAddress }) {
+          id
+          from
+          to
+          value
+          timestamp
+        }
+      }
+    `;
+
+    const variables = { userAddress: userAddress.toLowerCase() }; // Convert address to lowercase
+
+    const response = await fetch(
+      "https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query, variables }),
+      }
+    );
+
+    const { data } = await response.json();
+
+    console.log("Incoming Transactions:", data.incoming);
+    console.log("Outgoing Transactions:", data.outgoing);
+
+    return data;
+  };
+
   const showPopup = (message) => {
     alert(message);
   };
@@ -165,6 +205,11 @@ export const AppProvider = ({ children }) => {
               }
             : msg.component && msg.component.type === CurrentPrice
             ? { type: "currentPrice", currency: msg.component.props.currency }
+            : msg.component && msg.component.type === Prediction
+            ? {
+                type: "prediction",
+                days: msg.component.props.days,
+              }
             : "Missing content"), // ✅ Ensure valid content
       }));
 
@@ -231,6 +276,13 @@ export const AppProvider = ({ children }) => {
         ) : typeof msg.content === "object" &&
           msg.content.type === "currentPrice" ? (
           <CurrentPrice key={Date.now()} currency={msg.content.currency} />
+        ) : typeof msg.content === "object" &&
+          msg.content.type === "prediction" ? (
+          <Prediction
+            key={Date.now()}
+            days={msg.content.days}
+            onAnalysis={() => {}}
+          />
         ) : null,
     }));
 

@@ -1,0 +1,16 @@
+query ($userAddress: String!) {
+  incoming: transfers(where: { to: $userAddress }) {
+    id
+    from
+    to
+    value
+    timestamp
+  }
+  outgoing: transfers(where: { from: $userAddress }) {
+    id
+    from
+    to
+    value
+    timestamp
+  }
+}

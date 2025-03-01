@@ -4,6 +4,7 @@ import Spinner from "../assets/Spinner@1x-1.0s-200px-200px (1).gif";
 import { AppContext } from "../context/AppContext";
 import Balance from "./balance";
 import CurrentPrice from "./CurrentPrice";
+import Prediction from "./Prediction";
 import Logo from "../assets/logo.png";
 import TheGraph from "../assets/TheGraph.png";
 import Scroll from "../assets/Scroll.svg";
@@ -76,6 +77,15 @@ export default function ChatInterface() {
             .concat({
               isComponent: true,
               component: <CurrentPrice key={Date.now()} currency="bitcoin" />,
+            })
+        );
+      } else if (message.toLowerCase().includes("predict eth price")) {
+        setMessages((prevMessages) =>
+          prevMessages
+            .filter((msg) => !msg.isLoading)
+            .concat({
+              isComponent: true,
+              component: <Prediction key={Date.now()} />,
             })
         );
       } else if (message.toLowerCase().includes("transaction")) {
