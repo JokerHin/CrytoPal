@@ -13,7 +13,7 @@ import {
 
 ChartJS.register(LineElement, PointElement, LinearScale, Title, CategoryScale);
 
-const CryptoTrendPredictor = ({ days: initialDays }) => {
+const CryptoTrendPredictor = ({ days: initialDays, currency = "ethereum" }) => {
   const [prices, setPrices] = useState([]);
   const [prediction, setPrediction] = useState(null);
   const [days, setDays] = useState(initialDays || 30); // Default: 30 days prediction
@@ -39,14 +39,14 @@ const CryptoTrendPredictor = ({ days: initialDays }) => {
   useEffect(() => {
     const fetchPrices = async () => {
       const response = await axios.get(
-        "https://api.coingecko.com/api/v3/coins/ethereum/market_chart?vs_currency=usd&days=365"
+        `https://api.coingecko.com/api/v3/coins/${currency}/market_chart?vs_currency=usd&days=365`
       );
       const priceData = response.data.prices.map((p) => p[1]);
       setPrices(priceData);
       trainModel(priceData);
     };
     fetchPrices();
-  }, []);
+  }, [currency]);
 
   const trainModel = async (priceData) => {
     const xs = tf.tensor(priceData.slice(0, -1));

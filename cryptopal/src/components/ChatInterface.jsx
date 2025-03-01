@@ -79,16 +79,31 @@ export default function ChatInterface() {
               component: <CurrentPrice key={Date.now()} currency="bitcoin" />,
             })
         );
-      } else if (message.toLowerCase().includes("predict eth price")) {
+      } else if (
+        message.toLowerCase().includes("predict eth price") ||
+        message.toLowerCase().includes("predict ethereum price")
+      ) {
         setMessages((prevMessages) =>
           prevMessages
             .filter((msg) => !msg.isLoading)
             .concat({
               isComponent: true,
-              component: <Prediction key={Date.now()} />,
+              component: <Prediction key={Date.now()} currency="ethereum" />,
             })
         );
-      } else if (message.toLowerCase().includes("transaction")) {
+      } else if (
+        message.toLowerCase().includes("predict btc price") ||
+        message.toLowerCase().includes("predict bitcoin price")
+      ) {
+        setMessages((prevMessages) =>
+          prevMessages
+            .filter((msg) => !msg.isLoading)
+            .concat({
+              isComponent: true,
+              component: <Prediction key={Date.now()} currency="bitcoin" />,
+            })
+        );
+      } else if (message.toLowerCase().includes("make transaction")) {
         const responseText = handleTransactionInput(message);
         setMessages((prevMessages) =>
           prevMessages.map((msg) =>

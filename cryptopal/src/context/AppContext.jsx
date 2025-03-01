@@ -74,41 +74,6 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  const performTransaction = async (to, amount) => {
-    if (!walletAddress || !provider) {
-      alert("Please connect your wallet first.");
-      return;
-    }
-
-    try {
-      const signer = await provider.getSigner();
-      const contractWithSigner = contract.connect(signer);
-      const tx = await contractWithSigner.desposit({
-        value: ethers.parseEther(amount),
-      });
-
-      await tx.wait();
-      alert(`Transaction successful! Hash: ${tx.hash}`);
-      setTransactionStep(0); // Reset transaction step after success
-
-      // Show receipt
-      setMessages((prevMessages) =>
-        prevMessages.concat({
-          isComponent: true,
-          component: (
-            <Receipt
-              key={Date.now()}
-              walletAddress={walletAddress}
-              recipientAddress={to}
-            />
-          ),
-        })
-      );
-    } catch (error) {
-      console.error("Error performing transaction:", error);
-    }
-  };
-
   const handleTransactionInput = (input) => {
     if (transactionStep === 0) {
       setMessages((prevMessages) =>
@@ -209,6 +174,7 @@ export const AppProvider = ({ children }) => {
             ? {
                 type: "prediction",
                 days: msg.component.props.days,
+                currency: msg.component.props.currency,
               }
             : "Missing content"), // ✅ Ensure valid content
       }));
@@ -281,7 +247,7 @@ export const AppProvider = ({ children }) => {
           <Prediction
             key={Date.now()}
             days={msg.content.days}
-            onAnalysis={() => {}}
+            currency={msg.content.currency}
           />
         ) : null,
     }));
@@ -327,7 +293,6 @@ export const AppProvider = ({ children }) => {
         setHistory,
         connectWallet,
         getBalance,
-        performTransaction,
         handleTransactionInput,
         walletAddress,
         loadChatHistory,
