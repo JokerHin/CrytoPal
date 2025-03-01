@@ -3,6 +3,7 @@ import axios from "axios";
 import Spinner from "../assets/Spinner@1x-1.0s-200px-200px (1).gif";
 import { AppContext } from "../context/AppContext";
 import Balance from "./balance";
+import CurrentPrice from "./CurrentPrice";
 import Logo from "../assets/logo.png";
 import TheGraph from "../assets/TheGraph.png";
 import Scroll from "../assets/Scroll.svg";
@@ -51,6 +52,30 @@ export default function ChatInterface() {
             .concat({
               isComponent: true,
               component: <Balance key={Date.now()} balance={balance} />,
+            })
+        );
+      } else if (
+        message.toLowerCase().includes("eth current price") ||
+        message.toLowerCase().includes("ethereum current price")
+      ) {
+        setMessages((prevMessages) =>
+          prevMessages
+            .filter((msg) => !msg.isLoading)
+            .concat({
+              isComponent: true,
+              component: <CurrentPrice key={Date.now()} currency="ethereum" />,
+            })
+        );
+      } else if (
+        message.toLowerCase().includes("btc current price") ||
+        message.toLowerCase().includes("bitcoin current price")
+      ) {
+        setMessages((prevMessages) =>
+          prevMessages
+            .filter((msg) => !msg.isLoading)
+            .concat({
+              isComponent: true,
+              component: <CurrentPrice key={Date.now()} currency="bitcoin" />,
             })
         );
       } else if (message.toLowerCase().includes("transaction")) {

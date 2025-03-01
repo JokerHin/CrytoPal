@@ -30,6 +30,14 @@ router.post("/save", async (req, res) => {
             }
           : msg.content.type === "transaction" && msg.content.details
           ? { type: "transaction", details: msg.content.details }
+          : msg.content.type === "receipt" && msg.content.walletAddress
+          ? {
+              type: "receipt",
+              walletAddress: msg.content.walletAddress,
+              recipientAddress: msg.content.recipientAddress,
+            }
+          : msg.content.type === "currentPrice" && msg.content.currency
+          ? { type: "currentPrice", currency: msg.content.currency }
           : "Missing content", // ✅ Ensure valid content
     }));
 
@@ -72,6 +80,14 @@ router.put("/update/:id", async (req, res) => {
             }
           : msg.content.type === "transaction" && msg.content.details
           ? { type: "transaction", details: msg.content.details }
+          : msg.content.type === "receipt" && msg.content.walletAddress
+          ? {
+              type: "receipt",
+              walletAddress: msg.content.walletAddress,
+              recipientAddress: msg.content.recipientAddress,
+            }
+          : msg.content.type === "currentPrice" && msg.content.currency
+          ? { type: "currentPrice", currency: msg.content.currency }
           : "Missing content", // ✅ Ensure valid content
     }));
 

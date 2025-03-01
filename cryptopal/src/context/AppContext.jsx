@@ -4,6 +4,7 @@ import abi from "../../abi.json";
 import Balance from "../components/balance";
 import Receipt from "../components/Receipt";
 import Transaction from "../components/Transaction";
+import CurrentPrice from "../components/CurrentPrice";
 import axios from "axios";
 
 export const AppContext = createContext();
@@ -156,6 +157,14 @@ export const AppProvider = ({ children }) => {
               }
             : msg.component && msg.component.type === Transaction
             ? { type: "transaction", details: "Transaction details" }
+            : msg.component && msg.component.type === Receipt
+            ? {
+                type: "receipt",
+                walletAddress: msg.component.props.walletAddress,
+                recipientAddress: msg.component.props.recipientAddress,
+              }
+            : msg.component && msg.component.type === CurrentPrice
+            ? { type: "currentPrice", currency: msg.component.props.currency }
             : "Missing content"), // ✅ Ensure valid content
       }));
 
@@ -212,6 +221,16 @@ export const AppProvider = ({ children }) => {
           />
         ) : msg.content === "Transaction details" ? (
           <Transaction key={Date.now()} />
+        ) : typeof msg.content === "object" &&
+          msg.content.type === "receipt" ? (
+          <Receipt
+            key={Date.now()}
+            walletAddress={msg.content.walletAddress}
+            recipientAddress={msg.content.recipientAddress}
+          />
+        ) : typeof msg.content === "object" &&
+          msg.content.type === "currentPrice" ? (
+          <CurrentPrice key={Date.now()} currency={msg.content.currency} />
         ) : null,
     }));
 
