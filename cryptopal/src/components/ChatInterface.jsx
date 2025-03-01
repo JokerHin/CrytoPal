@@ -3,6 +3,9 @@ import axios from "axios";
 import Spinner from "../assets/Spinner@1x-1.0s-200px-200px (1).gif";
 import { AppContext } from "../context/AppContext";
 import Balance from "./balance";
+import Logo from "../assets/logo.png";
+import TheGraph from "../assets/TheGraph.png";
+import Scroll from "../assets/Scroll.svg";
 
 export default function ChatInterface() {
   const { messages, setMessages, getBalance, handleTransactionInput } =
@@ -13,32 +16,32 @@ export default function ChatInterface() {
   const handleKeyPress = (event) => {
     if (event.key === "Enter" && input.trim()) {
       setInput("");
-      handleSend();
+      handleSend(input);
     }
   };
 
   const handleSubmit = () => {
     if (input.trim()) {
       setInput("");
-      handleSend();
+      handleSend(input);
     } else {
       alert("Input cannot be empty.");
     }
   };
 
-  const handleSend = async () => {
-    if (!input.trim()) return;
+  const handleSend = async (message) => {
+    if (!message.trim()) return;
 
     setLoading(true);
 
     setMessages([
       ...messages,
-      { text: input, isBot: false },
+      { text: message, isBot: false },
       { text: "Assistant is typing...", isBot: true, isLoading: true },
     ]);
 
     try {
-      if (input.toLowerCase().includes("balance")) {
+      if (message.toLowerCase().includes("balance")) {
         const balance = await getBalance();
 
         // ✅ Add Balance component instead of text
@@ -50,8 +53,8 @@ export default function ChatInterface() {
               component: <Balance key={Date.now()} balance={balance} />,
             })
         );
-      } else if (input.toLowerCase().includes("transaction")) {
-        const responseText = handleTransactionInput(input);
+      } else if (message.toLowerCase().includes("transaction")) {
+        const responseText = handleTransactionInput(message);
         setMessages((prevMessages) =>
           prevMessages.map((msg) =>
             msg.isLoading
@@ -66,7 +69,7 @@ export default function ChatInterface() {
         const response = await axios.post(
           "http://localhost:3000/api/chat/generate-prompt",
           {
-            input,
+            input: message,
           },
           {
             headers: {
@@ -111,8 +114,33 @@ export default function ChatInterface() {
     <div className="w-full h-full p-4 z-10 flex flex-col relative">
       <div className="w-full mx-auto rounded-lg p-4 items-center justify-center flex-1">
         {messages.length === 0 ? (
-          <div className="text-center text-violet-500 text-[40pt] h-[380px] items-center justify-center flex">
-            What can I assist you with today?
+          <div className="h-[380px] items-center pt-30">
+            <div className="text-center text-violet-500 text-[40pt] block ">
+              What can I assist you with today?
+            </div>
+            <div className="flex items-center justify-center gap-10 mt-7">
+              <button
+                className="border border-gray-400 rounded-full px-7 hover:bg-gray-100 cursor-pointer w-[20%] flex justify-center text-center hover:shadow-lg hover:shadow-violet-200"
+                onClick={() => handleSend("What is CryptoPal?")}
+              >
+                <img src={Logo} alt="CryptoPal" className="w-15 ml-[-20px]" />
+                <p className="mt-3">What is CryptoPal?</p>
+              </button>
+              <button
+                className="border border-gray-400 rounded-full px-7 py-2 hover:bg-gray-100 cursor-pointer w-[20%] flex justify-evenly hover:shadow-lg hover:shadow-violet-200"
+                onClick={() => handleSend("What is Scroll?")}
+              >
+                <img src={Scroll} alt="Scroll" className="w-7 ml-[-10px]" />
+                <p>What is Scroll?</p>
+              </button>
+              <button
+                className="border border-gray-400 rounded-full px-7 py-2 hover:bg-gray-100 cursor-pointer w-[20%] flex justify-evenly hover:shadow-lg hover:shadow-violet-200"
+                onClick={() => handleSend("What is The Graph?")}
+              >
+                <img src={TheGraph} alt="The Graph" className="w-7" />
+                <p className="mt-1">What is The Graph?</p>
+              </button>
+            </div>
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center">
