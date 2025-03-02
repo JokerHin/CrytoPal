@@ -9,6 +9,10 @@ export default function Transaction() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!recipient || !amount) {
+      alert("Please fill in all fields.");
+      return;
+    }
     setLoading(true);
     await performTransaction(recipient, amount);
     setLoading(false);

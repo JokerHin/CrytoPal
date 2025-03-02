@@ -74,6 +74,41 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  const performTransaction = async (to, amount) => {
+    if (!walletAddress || !provider) {
+      alert("Please connect your wallet first.");
+      return;
+    }
+
+    try {
+      const signer = await provider.getSigner();
+      const contractWithSigner = contract.connect(signer);
+      const tx = await contractWithSigner.deposit({
+        value: ethers.parseEther(amount),
+      });
+
+      await tx.wait();
+      alert(`Transaction successful! Hash: ${tx.hash}`);
+      setTransactionStep(0); // Reset transaction step after success
+
+      // Show receipt
+      setMessages((prevMessages) =>
+        prevMessages.concat({
+          isComponent: true,
+          component: (
+            <Receipt
+              key={Date.now()}
+              walletAddress={walletAddress}
+              recipientAddress={to}
+            />
+          ),
+        })
+      );
+    } catch (error) {
+      console.error("Error performing transaction:", error);
+    }
+  };
+
   const handleTransactionInput = (input) => {
     if (transactionStep === 0) {
       setMessages((prevMessages) =>
@@ -175,6 +210,7 @@ export const AppProvider = ({ children }) => {
                 type: "prediction",
                 days: msg.component.props.days,
                 currency: msg.component.props.currency,
+                analysis: msg.component.props.analysis,
               }
             : "Missing content"), // ✅ Ensure valid content
       }));
@@ -248,8 +284,11 @@ export const AppProvider = ({ children }) => {
             key={Date.now()}
             days={msg.content.days}
             currency={msg.content.currency}
+            analysis={msg.content.analysis}
           />
-        ) : null,
+        ) : (
+          msg.content
+        ),
     }));
 
     setMessages(formattedMessages);
@@ -294,6 +333,7 @@ export const AppProvider = ({ children }) => {
         connectWallet,
         getBalance,
         handleTransactionInput,
+        performTransaction,
         walletAddress,
         loadChatHistory,
         deleteChatHistory,

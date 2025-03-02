@@ -38,6 +38,13 @@ router.post("/save", async (req, res) => {
             }
           : msg.content.type === "currentPrice" && msg.content.currency
           ? { type: "currentPrice", currency: msg.content.currency }
+          : msg.content.type === "prediction" && msg.content.days
+          ? {
+              type: "prediction",
+              days: msg.content.days,
+              currency: msg.content.currency,
+              analysis: msg.content.analysis,
+            }
           : "Missing content", // ✅ Ensure valid content
     }));
 
@@ -88,6 +95,13 @@ router.put("/update/:id", async (req, res) => {
             }
           : msg.content.type === "currentPrice" && msg.content.currency
           ? { type: "currentPrice", currency: msg.content.currency }
+          : msg.content.type === "prediction" && msg.content.days
+          ? {
+              type: "prediction",
+              days: msg.content.days,
+              currency: msg.content.currency,
+              analysis: msg.content.analysis,
+            }
           : "Missing content", // ✅ Ensure valid content
     }));
 
