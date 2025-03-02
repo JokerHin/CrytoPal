@@ -6,8 +6,9 @@ import Balance from "./balance";
 import CurrentPrice from "./CurrentPrice";
 import Prediction from "./Prediction";
 import News from "./LatestNews";
+import TheGraph from "./TheGraph"; // Import TheGraph component
 import Logo from "../assets/logo.png";
-import TheGraph from "../assets/TheGraph.png";
+import TheGraphLogo from "../assets/TheGraph.png";
 import Scroll from "../assets/Scroll.svg";
 
 export default function ChatInterface() {
@@ -125,6 +126,17 @@ export default function ChatInterface() {
               : msg
           )
         );
+      } else if (
+        message.toLowerCase().includes("give transaction from the graph")
+      ) {
+        setMessages((prevMessages) =>
+          prevMessages
+            .filter((msg) => !msg.isLoading)
+            .concat({
+              isComponent: true,
+              component: <TheGraph key={Date.now()} />,
+            })
+        );
       } else {
         const response = await axios.post(
           "http://localhost:3000/api/chat/generate-prompt",
@@ -197,7 +209,7 @@ export default function ChatInterface() {
                 className="border border-gray-400 rounded-full px-7 py-2 hover:bg-gray-100 cursor-pointer w-[20%] flex justify-evenly hover:shadow-lg hover:shadow-violet-200"
                 onClick={() => handleSend("What is The Graph?")}
               >
-                <img src={TheGraph} alt="The Graph" className="w-7" />
+                <img src={TheGraphLogo} alt="The Graph" className="w-7" />
                 <p className="mt-1">What is The Graph?</p>
               </button>
             </div>

@@ -5,11 +5,11 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum
-    name: Unnamed token
+    name: CryptoPalWallet
     network: scroll-sepolia
     source:
-      address: "0x77Ca6C90541036A4DAf4EcFdaC3e4B4E361dc86C"
-      abi: Unnamed token
+      address: "0x77Ca6C90541036A4DAf4EcFdaC3e4B4E361dc86C" # Ensure this is the correct contract address
+      abi: CryptoPalWallet
       startBlock: 8366726
     mapping:
       kind: ethereum/events
@@ -19,8 +19,8 @@ dataSources:
         - Deposit
         - Withdraw
       abis:
-        - name: Unnamed token
-          file: ./abis/Unnamed token.json
+        - name: CryptoPalWallet
+          file: ./abis/CryptoPalWallet.json # Ensure this file exists and is correct
       eventHandlers:
         - event: Deposit(indexed address,uint256)
           handler: handleDeposit
