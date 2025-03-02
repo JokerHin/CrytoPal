@@ -6,7 +6,7 @@ import Receipt from "../components/Receipt";
 import Transaction from "../components/Transaction";
 import CurrentPrice from "../components/CurrentPrice";
 import Prediction from "../components/Prediction";
-import axios from "axios";
+import News from "../components/LatestNews";
 
 export const AppContext = createContext();
 
@@ -212,6 +212,8 @@ export const AppProvider = ({ children }) => {
                 currency: msg.component.props.currency,
                 analysis: msg.component.props.analysis,
               }
+            : msg.component && msg.component.type === News
+            ? { type: "news" }
             : "Missing content"), // ✅ Ensure valid content
       }));
 
@@ -286,6 +288,8 @@ export const AppProvider = ({ children }) => {
             currency={msg.content.currency}
             analysis={msg.content.analysis}
           />
+        ) : msg.content === "news" ? (
+          <News key={Date.now()} />
         ) : (
           msg.content
         ),

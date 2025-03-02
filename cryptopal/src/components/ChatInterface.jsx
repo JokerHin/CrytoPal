@@ -5,6 +5,7 @@ import { AppContext } from "../context/AppContext";
 import Balance from "./balance";
 import CurrentPrice from "./CurrentPrice";
 import Prediction from "./Prediction";
+import News from "./LatestNews";
 import Logo from "../assets/logo.png";
 import TheGraph from "../assets/TheGraph.png";
 import Scroll from "../assets/Scroll.svg";
@@ -43,7 +44,7 @@ export default function ChatInterface() {
     ]);
 
     try {
-      if (message.toLowerCase().includes("balance")) {
+      if (message.toLowerCase().includes("account balance")) {
         const balance = await getBalance();
 
         // ✅ Add Balance component instead of text
@@ -101,6 +102,15 @@ export default function ChatInterface() {
             .concat({
               isComponent: true,
               component: <Prediction key={Date.now()} currency="bitcoin" />,
+            })
+        );
+      } else if (message.toLowerCase().includes("latest news")) {
+        setMessages((prevMessages) =>
+          prevMessages
+            .filter((msg) => !msg.isLoading)
+            .concat({
+              isComponent: true,
+              component: <News key={Date.now()} />,
             })
         );
       } else if (message.toLowerCase().includes("make transaction")) {
