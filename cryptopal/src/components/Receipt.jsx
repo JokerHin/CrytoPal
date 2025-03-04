@@ -1,7 +1,15 @@
 import React from "react";
 import Success from "../assets/success.png";
 
-export default function Receipt() {
+export default function Receipt({ network, transactionHash }) {
+  const getExplorerUrl = () => {
+    if (network === "scroll") {
+      return `https://scroll-sepolia.blockscout.com/tx/${transactionHash}`;
+    } else if (network === "vanguard") {
+      return `https://explorer-vanguard.vanarchain.com/tx/${transactionHash}`;
+    }
+  };
+
   return (
     <div className="rounded-2xl p-4 w-[50%] flex flex-col items-center justify-center bg-gray-100">
       <div className="flex items-center justify-evenly text-center w-full">
@@ -13,7 +21,7 @@ export default function Receipt() {
         </div>
 
         <a
-          href="https://scroll-sepolia.blockscout.com/"
+          href={getExplorerUrl()}
           target="_blank"
           rel="noopener noreferrer"
           className="text-gray-500 underline hover:text-black"

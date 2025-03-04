@@ -1,6 +1,7 @@
 import React, { createContext, useState } from "react";
 import { ethers } from "ethers";
-import abi from "../../abi.json";
+import scrollAbi from "../../abi.json";
+import vanguardAbi from "../../vanguardAbi.json";
 import Balance from "../components/balance";
 import Receipt from "../components/Receipt";
 import Transaction from "../components/Transaction";
@@ -40,20 +41,6 @@ export const AppProvider = ({ children }) => {
       console.log("Wallet connected:", address);
       setWalletAddress(address);
       setProvider(providerInstance);
-
-      const contractAddress = import.meta.env.VITE_SCROLL_CONTRACT_ADDRESS;
-      console.log("Smart contract address:", contractAddress);
-      if (!contractAddress) {
-        console.error("Smart contract address is missing in .env");
-        return;
-      }
-
-      const contractInstance = new ethers.Contract(
-        contractAddress,
-        abi,
-        signer
-      );
-      setContract(contractInstance);
     } catch (error) {
       console.error("Error connecting wallet:", error);
     }
@@ -74,42 +61,71 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  const performTransaction = async (to, amount) => {
+  const performTransaction = async (to, amount, network = "scroll") => {
     if (!walletAddress || !provider) {
       alert("Please connect your wallet first.");
       return;
     }
 
     try {
+      let contractAddress;
+      let abi;
+      if (network === "scroll") {
+        contractAddress = import.meta.env.VITE_SCROLL_CONTRACT_ADDRESS;
+        abi = scrollAbi;
+      } else if (network === "vanguard") {
+        contractAddress = import.meta.env.VITE_VANAR_CONTRACT_ADDRESS;
+        abi = vanguardAbi;
+      }
+
+      console.log("Smart contract address:", contractAddress);
+      if (!contractAddress) {
+        console.error("Smart contract address is missing in .env");
+        return;
+      }
+
       const signer = await provider.getSigner();
-      const contractWithSigner = contract.connect(signer);
-      const tx = await contractWithSigner.deposit({
+      const contractInstance = new ethers.Contract(
+        contractAddress,
+        abi,
+        signer
+      );
+      const tx = await contractInstance.deposit({
         value: ethers.parseEther(amount),
       });
 
-      await tx.wait();
-      alert(`Transaction successful! Hash: ${tx.hash}`);
-      setTransactionStep(0); // Reset transaction step after success
+      console.log("Transaction sent:", tx);
+      const receipt = await tx.wait();
+      console.log("Transaction mined:", receipt);
 
-      // Show receipt
-      setMessages((prevMessages) =>
-        prevMessages.concat({
-          isComponent: true,
-          component: (
-            <Receipt
-              key={Date.now()}
-              walletAddress={walletAddress}
-              recipientAddress={to}
-            />
-          ),
-        })
-      );
+      if (receipt.status === 1) {
+        alert(`Transaction successful! Hash: ${tx.hash}`);
+        setTransactionStep(0); // Reset transaction step after success
+
+        // Show receipt
+        setMessages((prevMessages) =>
+          prevMessages.concat({
+            isComponent: true,
+            component: (
+              <Receipt
+                key={Date.now()}
+                walletAddress={walletAddress}
+                recipientAddress={to}
+                network={network}
+                transactionHash={tx.hash}
+              />
+            ),
+          })
+        );
+      } else {
+        alert("Transaction failed.");
+      }
     } catch (error) {
       console.error("Error performing transaction:", error);
     }
   };
 
-  const handleTransactionInput = (input) => {
+  const handleTransactionInput = (input, network = "scroll") => {
     if (transactionStep === 0) {
       setMessages((prevMessages) =>
         prevMessages.concat({
@@ -128,7 +144,11 @@ export const AppProvider = ({ children }) => {
       setTransactionStep(3);
       return `You are about to transfer ${input} ETH to ${transactionDetails.to}. Please confirm.`;
     } else if (transactionStep === 3) {
-      performTransaction(transactionDetails.to, transactionDetails.amount);
+      performTransaction(
+        transactionDetails.to,
+        transactionDetails.amount,
+        network
+      );
       return `Transaction of ${transactionDetails.amount} ETH to ${transactionDetails.to} completed.`;
     }
   };

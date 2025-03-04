@@ -4,7 +4,7 @@ import { gql, request } from "graphql-request";
 
 const query = gql`
   {
-    deposits(first: 5) {
+    deposits {
       id
       user
       amount
@@ -12,7 +12,7 @@ const query = gql`
       blockTimestamp
       transactionHash
     }
-    withdraws(first: 5) {
+    withdraws {
       id
       user
       amount

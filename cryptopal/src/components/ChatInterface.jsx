@@ -6,10 +6,11 @@ import Balance from "./balance";
 import CurrentPrice from "./CurrentPrice";
 import Prediction from "./Prediction";
 import News from "./LatestNews";
-import TheGraph from "./TheGraph"; // Import TheGraph component
+import TheGraph from "./TheGraph";
 import Logo from "../assets/logo.png";
 import TheGraphLogo from "../assets/TheGraph.png";
 import Scroll from "../assets/Scroll.svg";
+import VanarLogo from "../assets/VanarChain.webp"; // Add the Vanar logo import
 
 export default function ChatInterface() {
   const { messages, setMessages, getBalance, handleTransactionInput } =
@@ -115,7 +116,10 @@ export default function ChatInterface() {
             })
         );
       } else if (message.toLowerCase().includes("make transaction")) {
-        const responseText = handleTransactionInput(message);
+        const network = message.toLowerCase().includes("vanguard")
+          ? "vanguard"
+          : "scroll";
+        const responseText = handleTransactionInput(message, network);
         setMessages((prevMessages) =>
           prevMessages.map((msg) =>
             msg.isLoading
@@ -190,7 +194,7 @@ export default function ChatInterface() {
             <div className="text-center text-violet-500 text-[40pt] block ">
               What can I assist you with today?
             </div>
-            <div className="flex items-center justify-center gap-10 mt-7">
+            <div className="flex items-center justify-center gap-5 mt-7">
               <button
                 className="border border-gray-400 rounded-full px-7 hover:bg-gray-100 cursor-pointer w-[20%] flex justify-center text-center hover:shadow-lg hover:shadow-violet-200"
                 onClick={() => handleSend("What is CryptoPal?")}
@@ -203,14 +207,21 @@ export default function ChatInterface() {
                 onClick={() => handleSend("What is Scroll?")}
               >
                 <img src={Scroll} alt="Scroll" className="w-7 ml-[-10px]" />
-                <p>What is Scroll?</p>
+                <p className="mt-0.5">What is Scroll?</p>
               </button>
               <button
                 className="border border-gray-400 rounded-full px-7 py-2 hover:bg-gray-100 cursor-pointer w-[20%] flex justify-evenly hover:shadow-lg hover:shadow-violet-200"
                 onClick={() => handleSend("What is The Graph?")}
               >
                 <img src={TheGraphLogo} alt="The Graph" className="w-7" />
-                <p className="mt-1">What is The Graph?</p>
+                <p className="mt-0.5">What is The Graph?</p>
+              </button>
+              <button
+                className="border border-gray-400 rounded-full px-7 py-2 hover:bg-gray-100 cursor-pointer w-[20%] flex justify-evenly hover:shadow-lg hover:shadow-violet-200"
+                onClick={() => handleSend("What is Vanar?")}
+              >
+                <img src={VanarLogo} alt="Vanar" className="w-7" />
+                <p className="mt-0.5">What is Vanar?</p>
               </button>
             </div>
           </div>
