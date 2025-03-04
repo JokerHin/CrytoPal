@@ -1,11 +1,14 @@
 <h1>©️ CryptoPal - Your Web3 AI Assistant</h1>
 
+<h3>[ 🚀Scroll | 🚀Vanar | 🚀The Graph ]</h3>
 <h3>An AI-powered crypto assistant chatbot capable of:</h3>
 <ul>
-  <li>✅ Price prediction</li>
-  <li>✅ Market analysis</li>
+  <li>✅ Price prediction using Deep Learning</li>
+  <li>✅ Market analysis with indicator</li>
   <li>✅ Fetching the latest crypto news</li>
   <li>✅ Automated wallet transactions</li>
+  <li>✅ Real-time transaction data with The Graph</li>
+  <li>✅ Answer and provide Web3 knowledge</li>
 </ul>
 
 <h2>🔗 Smart Contract Verifications</h2>
@@ -24,6 +27,7 @@
   <li>Real-time price tracking</li>
   <li>Secure and automated transactions</li>
   <li>Web3 wallet integration</li>
+  <li>Real-time transaction data</li>
 </ul>
 
 <h2>🛠️ Installation</h2>
