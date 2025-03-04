@@ -41,7 +41,7 @@ export const AppProvider = ({ children }) => {
       setWalletAddress(address);
       setProvider(providerInstance);
 
-      const contractAddress = import.meta.env.VITE_CONTRACT_ADDRESS;
+      const contractAddress = import.meta.env.VITE_SCROLL_CONTRACT_ADDRESS;
       console.log("Smart contract address:", contractAddress);
       if (!contractAddress) {
         console.error("Smart contract address is missing in .env");
@@ -131,45 +131,6 @@ export const AppProvider = ({ children }) => {
       performTransaction(transactionDetails.to, transactionDetails.amount);
       return `Transaction of ${transactionDetails.amount} ETH to ${transactionDetails.to} completed.`;
     }
-  };
-
-  const fetchTransactionHistory = async (userAddress) => {
-    const query = `
-      query ($userAddress: String!) {
-        incoming: transfers(where: { to: $userAddress }) {
-          id
-          from
-          to
-          value
-          timestamp
-        }
-        outgoing: transfers(where: { from: $userAddress }) {
-          id
-          from
-          to
-          value
-          timestamp
-        }
-      }
-    `;
-
-    const variables = { userAddress: userAddress.toLowerCase() }; // Convert address to lowercase
-
-    const response = await fetch(
-      "https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query, variables }),
-      }
-    );
-
-    const { data } = await response.json();
-
-    console.log("Incoming Transactions:", data.incoming);
-    console.log("Outgoing Transactions:", data.outgoing);
-
-    return data;
   };
 
   const showPopup = (message) => {

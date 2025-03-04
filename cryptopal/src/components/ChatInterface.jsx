@@ -127,7 +127,7 @@ export default function ChatInterface() {
           )
         );
       } else if (
-        message.toLowerCase().includes("give transaction from the graph")
+        message.toLowerCase().includes("transaction record from the graph")
       ) {
         setMessages((prevMessages) =>
           prevMessages
