@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import axios from "axios";
 import Spinner from "../assets/Spinner@1x-1.0s-200px-200px (1).gif";
 import { AppContext } from "../context/AppContext";
@@ -17,6 +17,10 @@ export default function ChatInterface() {
     useContext(AppContext);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const handleKeyPress = (event) => {
     if (event.key === "Enter" && input.trim()) {
@@ -46,7 +50,10 @@ export default function ChatInterface() {
     ]);
 
     try {
-      if (message.toLowerCase().includes("account balance")) {
+      if (
+        message.toLowerCase().includes("account balance") ||
+        message.toLowerCase().includes("wallet balance")
+      ) {
         const balance = await getBalance();
 
         // ✅ Add Balance component instead of text
@@ -173,6 +180,7 @@ export default function ChatInterface() {
     }
 
     setLoading(false);
+    scrollToBottom();
   };
 
   const renderMessageText = (text) => {
@@ -184,6 +192,13 @@ export default function ChatInterface() {
         part
       )
     );
+  };
+
+  const scrollToBottom = () => {
+    const messageContainer = document.getElementById("message-container");
+    if (messageContainer) {
+      messageContainer.scrollTop = messageContainer.scrollHeight;
+    }
   };
 
   return (
@@ -227,7 +242,10 @@ export default function ChatInterface() {
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center">
-            <div className="h-[600px] overflow-y-auto overflow-hidden mb-4 w-[90%] text-xl">
+            <div
+              id="message-container"
+              className="h-[600px] overflow-y-auto overflow-hidden mb-4 w-[90%] text-xl"
+            >
               {messages.map((msg, i) => (
                 <div
                   key={i}
@@ -254,7 +272,10 @@ export default function ChatInterface() {
             <input
               type="text"
               value={input}
-              onChange={(e) => setInput(e.target.value)}
+              onChange={(e) => {
+                setInput(e.target.value);
+                scrollToBottom();
+              }}
               onKeyPress={handleKeyPress}
               className="flex-1 p-4 border rounded focus:border-violet-500 focus:border-2 focus:outline-none shadow-lg shadow-violet-200 bg-white"
               placeholder="Ask CryptoPal..."
