@@ -4,9 +4,9 @@ import Success from "../assets/success.png";
 export default function Receipt({ network, transactionHash }) {
   const getExplorerUrl = () => {
     if (network === "scroll") {
-      return `https://scroll-sepolia.blockscout.com/tx/${transactionHash}`;
+      return `https://scroll-sepolia.blockscout.com/address/0x77Ca6C90541036A4DAf4EcFdaC3e4B4E361dc86C`;
     } else if (network === "vanguard") {
-      return `https://explorer-vanguard.vanarchain.com/tx/${transactionHash}`;
+      return `https://explorer-vanguard.vanarchain.com/address/0x0716f3787ff1a5F0725F5038dcd4F396FCDe5E43?tab=txs`;
     }
   };
 
