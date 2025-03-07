@@ -22,7 +22,7 @@ export default function History() {
     // Fetch chat history from the backend
     const fetchHistory = async () => {
       const response = await fetch(
-        "http://localhost:3000/api/chat/history?userId=1"
+        import.meta.env.VITE_BACKEND_URL + "/api/chat/history?userId=1"
       ); // Replace with actual userId
       const data = await response.json();
       setHistory(data);

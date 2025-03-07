@@ -206,7 +206,8 @@ export const AppProvider = ({ children }) => {
       let response;
       if (selectedDocument) {
         response = await fetch(
-          `http://localhost:3000/api/chat/update/${selectedDocument._id}`,
+          import.meta.env.VITE_BACKEND_URL +
+            `/api/chat/update/${selectedDocument._id}`,
           {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
@@ -214,11 +215,14 @@ export const AppProvider = ({ children }) => {
           }
         );
       } else {
-        response = await fetch("http://localhost:3000/api/chat/save", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ userId: 1, messages: formattedMessages }),
-        });
+        response = await fetch(
+          import.meta.env.VITE_BACKEND_URL + "/api/chat/save",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userId: 1, messages: formattedMessages }),
+          }
+        );
       }
 
       if (response.ok) {
@@ -283,7 +287,7 @@ export const AppProvider = ({ children }) => {
   const deleteChatHistory = async (id) => {
     try {
       const response = await fetch(
-        `http://localhost:3000/api/chat/delete/${id}`,
+        import.meta.env.VITE_BACKEND_URL + `/api/chat/delete/${id}`,
         {
           method: "DELETE",
         }

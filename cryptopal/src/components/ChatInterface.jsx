@@ -150,7 +150,7 @@ export default function ChatInterface() {
         );
       } else {
         const response = await axios.post(
-          "http://localhost:3000/api/chat/generate-prompt",
+          import.meta.env.VITE_BACKEND_URL + "/api/chat/generate-prompt",
           {
             input: message,
           },
