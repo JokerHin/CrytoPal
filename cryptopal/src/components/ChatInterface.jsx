@@ -7,7 +7,7 @@ import CurrentPrice from "./CurrentPrice";
 import Prediction from "./Prediction";
 import News from "./LatestNews";
 import TheGraph from "./TheGraph";
-import Logo from "../assets/logo.png";
+import Logo from "../assets/Logo.png";
 import TheGraphLogo from "../assets/TheGraph.png";
 import Scroll from "../assets/Scroll.svg";
 import VanarLogo from "../assets/VanarChain.webp"; // Add the Vanar logo import
