@@ -2,7 +2,7 @@ import React, { createContext, useState } from "react";
 import { ethers } from "ethers";
 import scrollAbi from "../../abi.json";
 import vanguardAbi from "../../vanguardAbi.json";
-import Balance from "../components/balance";
+import Balance from "../components/Balance";
 import Receipt from "../components/Receipt";
 import Transaction from "../components/Transaction";
 import CurrentPrice from "../components/CurrentPrice";
