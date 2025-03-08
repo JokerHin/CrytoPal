@@ -21,6 +21,10 @@
 <p><strong>Contract Address:</strong> <a href="https://explorer-vanguard.vanarchain.com/address/0x0716f3787ff1a5F0725F5038dcd4F396FCDe5E43?tab=txs" target="_blank">
 0x0716f3787ff1a5F0725F5038dcd4F396FCDe5E43</a></p>
 
+<h2>Video</h2>
+
+<h3><a>https://youtu.be/d9i7uehCSZQ</a></h3>
+
 <h2>🚀 Features</h2>
 <ul>
   <li>AI-driven crypto insights</li>
