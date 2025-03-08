@@ -23,7 +23,7 @@
 
 <h2>Video</h2>
 
-<h3><a>https://youtu.be/d9i7uehCSZQ</a></h3>
+<h3><a href="https://youtu.be/d9i7uehCSZQ">https://youtu.be/d9i7uehCSZQ</a></h3>
 
 <h2>🚀 Features</h2>
 <ul>
