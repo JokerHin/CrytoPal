@@ -1,4 +1,4 @@
-import "dotenv/config"; // Load environment variables from .env
+import "dotenv/config";
 import { google } from "@ai-sdk/google";
 import { generateObject } from "ai";
 import { z } from "zod";
@@ -59,7 +59,7 @@ const schema = z.object({
 
 export const generateAIResponse = async (userMessage) => {
   try {
-    const model = google("gemini-1.5-pro", {
+    const model = google("gemini-2.0-flash-lite-preview-02-05", {
       apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
     });
 
