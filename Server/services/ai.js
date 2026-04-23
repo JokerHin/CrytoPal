@@ -46,7 +46,7 @@ const schema = z.object({
       z.object({
         label: z.string(),
         action: z.string(),
-      })
+      }),
     )
     .optional(),
   table: z
@@ -59,7 +59,7 @@ const schema = z.object({
 
 export const generateAIResponse = async (userMessage) => {
   try {
-    const model = google("gemini-2.0-flash-lite-preview-02-05", {
+    const model = google("gemini-2.0-flash", {
       apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
     });
 
@@ -70,7 +70,7 @@ export const generateAIResponse = async (userMessage) => {
       userMessages = userMessage;
     } else {
       throw new Error(
-        "Invalid userMessage format: must be a string or array of messages"
+        "Invalid userMessage format: must be a string or array of messages",
       );
     }
 

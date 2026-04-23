@@ -21,11 +21,21 @@ export default function History() {
   useEffect(() => {
     // Fetch chat history from the backend
     const fetchHistory = async () => {
-      const response = await fetch(
-        import.meta.env.VITE_BACKEND_URL + "/api/chat/history?userId=1"
-      ); // Replace with actual userId
-      const data = await response.json();
-      setHistory(data);
+      try {
+        const response = await fetch(
+          import.meta.env.VITE_BACKEND_URL + "/api/chat/history?userId=1",
+        ); // Replace with actual userId
+        const data = await response.json();
+        if (Array.isArray(data)) {
+          setHistory(data);
+        } else {
+          console.error("Invalid history data received:", data);
+          setHistory([]);
+        }
+      } catch (error) {
+        console.error("Failed to fetch history:", error);
+        setHistory([]);
+      }
     };
 
     fetchHistory();
@@ -90,8 +100,8 @@ export default function History() {
               if (selectedDocument) {
                 setHistory(
                   history.map((doc) =>
-                    doc._id === savedHistory._id ? savedHistory : doc
-                  )
+                    doc._id === savedHistory._id ? savedHistory : doc,
+                  ),
                 );
               } else {
                 setHistory([...history, savedHistory]);

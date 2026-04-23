@@ -21,31 +21,31 @@ router.post("/save", async (req, res) => {
         typeof msg.content === "string"
           ? msg.content
           : msg.content.type === "balance" && msg.content.balance
-          ? { type: "balance", balance: msg.content.balance }
-          : msg.content.type === "transaction" && msg.content.walletAddress
-          ? {
-              type: "transaction",
-              walletAddress: msg.content.walletAddress,
-              recipientAddress: msg.content.recipientAddress,
-            }
-          : msg.content.type === "transaction" && msg.content.details
-          ? { type: "transaction", details: msg.content.details }
-          : msg.content.type === "receipt" && msg.content.walletAddress
-          ? {
-              type: "receipt",
-              walletAddress: msg.content.walletAddress,
-              recipientAddress: msg.content.recipientAddress,
-            }
-          : msg.content.type === "currentPrice" && msg.content.currency
-          ? { type: "currentPrice", currency: msg.content.currency }
-          : msg.content.type === "prediction" && msg.content.days
-          ? {
-              type: "prediction",
-              days: msg.content.days,
-              currency: msg.content.currency,
-              analysis: msg.content.analysis,
-            }
-          : "Missing content", // ✅ Ensure valid content
+            ? { type: "balance", balance: msg.content.balance }
+            : msg.content.type === "transaction" && msg.content.walletAddress
+              ? {
+                  type: "transaction",
+                  walletAddress: msg.content.walletAddress,
+                  recipientAddress: msg.content.recipientAddress,
+                }
+              : msg.content.type === "transaction" && msg.content.details
+                ? { type: "transaction", details: msg.content.details }
+                : msg.content.type === "receipt" && msg.content.walletAddress
+                  ? {
+                      type: "receipt",
+                      walletAddress: msg.content.walletAddress,
+                      recipientAddress: msg.content.recipientAddress,
+                    }
+                  : msg.content.type === "currentPrice" && msg.content.currency
+                    ? { type: "currentPrice", currency: msg.content.currency }
+                    : msg.content.type === "prediction" && msg.content.days
+                      ? {
+                          type: "prediction",
+                          days: msg.content.days,
+                          currency: msg.content.currency,
+                          analysis: msg.content.analysis,
+                        }
+                      : "Missing content", // ✅ Ensure valid content
     }));
 
     const newHistory = new ChatHistory({
@@ -78,37 +78,37 @@ router.put("/update/:id", async (req, res) => {
         typeof msg.content === "string"
           ? msg.content
           : msg.content.type === "balance" && msg.content.balance
-          ? { type: "balance", balance: msg.content.balance }
-          : msg.content.type === "transaction" && msg.content.walletAddress
-          ? {
-              type: "transaction",
-              walletAddress: msg.content.walletAddress,
-              recipientAddress: msg.content.recipientAddress,
-            }
-          : msg.content.type === "transaction" && msg.content.details
-          ? { type: "transaction", details: msg.content.details }
-          : msg.content.type === "receipt" && msg.content.walletAddress
-          ? {
-              type: "receipt",
-              walletAddress: msg.content.walletAddress,
-              recipientAddress: msg.content.recipientAddress,
-            }
-          : msg.content.type === "currentPrice" && msg.content.currency
-          ? { type: "currentPrice", currency: msg.content.currency }
-          : msg.content.type === "prediction" && msg.content.days
-          ? {
-              type: "prediction",
-              days: msg.content.days,
-              currency: msg.content.currency,
-              analysis: msg.content.analysis,
-            }
-          : "Missing content", // ✅ Ensure valid content
+            ? { type: "balance", balance: msg.content.balance }
+            : msg.content.type === "transaction" && msg.content.walletAddress
+              ? {
+                  type: "transaction",
+                  walletAddress: msg.content.walletAddress,
+                  recipientAddress: msg.content.recipientAddress,
+                }
+              : msg.content.type === "transaction" && msg.content.details
+                ? { type: "transaction", details: msg.content.details }
+                : msg.content.type === "receipt" && msg.content.walletAddress
+                  ? {
+                      type: "receipt",
+                      walletAddress: msg.content.walletAddress,
+                      recipientAddress: msg.content.recipientAddress,
+                    }
+                  : msg.content.type === "currentPrice" && msg.content.currency
+                    ? { type: "currentPrice", currency: msg.content.currency }
+                    : msg.content.type === "prediction" && msg.content.days
+                      ? {
+                          type: "prediction",
+                          days: msg.content.days,
+                          currency: msg.content.currency,
+                          analysis: msg.content.analysis,
+                        }
+                      : "Missing content", // ✅ Ensure valid content
     }));
 
     const updatedHistory = await ChatHistory.findByIdAndUpdate(
       id,
       { messages: formattedMessages.filter((msg) => msg.content) }, // Filter out messages without content
-      { new: true }
+      { new: true },
     );
 
     res.status(200).json(updatedHistory);
@@ -143,7 +143,10 @@ router.get("/history", async (req, res) => {
     const history = await ChatHistory.find({ userId });
     res.status(200).json(history);
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch chat history" });
+    console.error("Error fetching chat history:", error);
+    res
+      .status(500)
+      .json({ error: "Failed to fetch chat history", details: error.message });
   }
 });
 
